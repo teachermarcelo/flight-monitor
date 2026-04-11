@@ -1,0 +1,32 @@
+name: Create GitHub Issues for Alerts
+
+on:
+  schedule:
+    # Roda a cada 30 minutos (ajuste conforme necessidade)
+    - cron: '*/30 * * * *'
+  
+  # Permite rodar manualmente
+  workflow_dispatch:
+
+jobs:
+  create-issues:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        pip install supabase python-dotenv PyGithub
+    
+    - name: Create Issues for New Alerts
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: python scripts/create_github_issue.py
