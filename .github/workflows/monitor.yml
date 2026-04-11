@@ -30,8 +30,8 @@ jobs:
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        AMADEUS_CLIENT_ID: ${{ secrets.AMADEUS_CLIENT_ID }}
-        AMADEUS_CLIENT_SECRET: ${{ secrets.AMADEUS_CLIENT_SECRET }}
+        SABRE_CLIENT_ID: ${{ secrets.SABRE_CLIENT_ID }}
+SABRE_CLIENT_SECRET: ${{ secrets.SABRE_CLIENT_SECRET }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         MIN_PRICE_DROP_PERCENT: ${{ vars.MIN_PRICE_DROP_PERCENT }}
