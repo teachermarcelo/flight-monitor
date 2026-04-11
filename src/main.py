@@ -13,7 +13,14 @@ class FlightMonitor:
         self.db = Database()
         self.flight_search = FlightSearch()
         self.bot = TelegramBot()
-        self.min_drop_percent = float(os.getenv("MIN_PRICE_DROP_PERCENT", 15))
+               # Tenta pegar o segredo, mas garante que seja 15 se der erro
+        self.min_drop_percent = 15.0 
+        try:
+            val = os.getenv("MIN_PRICE_DROP_PERCENT")
+            if val:
+                self.min_drop_percent = float(val)
+        except:
+            pass
     
     def check_route(self, route):
         """Verifica uma rota específica"""
