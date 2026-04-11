@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Monitor Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✈️ Flight Monitor</h1>
+            <p class="subtitle">Dashboard de Monitoramento de Passagens</p>
+            <div id="last-update" class="update-info"></div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-value" id="total-routes">-</div>
+                <div class="stat-label">Rotas Monitoradas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value" id="total-prices">-</div>
+                <div class="stat-label">Preços Rastreados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🚨</div>
+                <div class="stat-value" id="total-alerts">-</div>
+                <div class="stat-label">Alertas Enviados</div>
+            </div>
+        </div>
+
+        <!-- Active Routes -->
+        <section class="section">
+            <h2>🎯 Rotas Monitoradas</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rota</th>
+                            <th>Preço Atual</th>
+                            <th>Máximo</th>
+                            <th>Companhia</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="routes-table">
+                        <tr><td colspan="5" class="loading">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer>
+            <p>Atualizado automaticamente • Dados do Supabase</p>
+            <a href="https://github.com/teachermarcelo/flight-monitor" target="_blank">Ver no GitHub</a>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
