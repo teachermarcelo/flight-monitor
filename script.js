@@ -1,7 +1,7 @@
 // ⚠️ IMPORTANTE: Substitua pelos seus dados do Supabase
 // Vá em Supabase > Project Settings > API
-const SUPABASE_URL = 'https://SEU-PROJETO.supabase.co';
-const SUPABASE_ANON_KEY = 'SUA-CHAVE-ANON';
+const SUPABASE_URL = 'https://rvgcniaowzmsudzliozf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_N_xCS0lbbTvG7qWTpAw0ag_vlg1lbHb';
 
 // Headers para requisições
 const headers = {
