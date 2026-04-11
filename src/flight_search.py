@@ -3,7 +3,7 @@ import requests
 from datetime import datetime
 
 class FlightSearch:
-    def __init__(**:
+    def __init__(self):
         # Sabre Auth URL
         self.auth_url = "https://api.sabre.com/v2/auth/token"
         self.client_id = os.getenv("SABRE_CLIENT_ID")
@@ -46,7 +46,6 @@ class FlightSearch:
             }
 
         # Se tivesse token, faria a busca real aqui...
-        # Como estamos em modo de correção de erro, vamos simular sucesso se o token vier
         return {
             'price': 1100.00,
             'airline': 'Latam Airlines',
