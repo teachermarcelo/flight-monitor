@@ -1,0 +1,7 @@
+supabase==2.3.0
+amadeus==6.11.0
+python-telegram-bot==20.7
+requests==2.31.0
+python-dotenv==1.0.0
+schedule==1.2.0
+PyGithub==2.1.1
