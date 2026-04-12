@@ -1,10 +1,8 @@
 import os
 import requests
-from datetime import datetime, timedelta
 
 class FlightSearch:
     def __init__(self):
-        # RapidAPI Configuration
         self.api_key = os.getenv("RAPIDAPI_KEY")
         self.api_host = os.getenv("RAPIDAPI_HOST")
         
@@ -12,32 +10,79 @@ class FlightSearch:
             print("❌ Credenciais da RapidAPI não encontradas!")
             self.client = None
         else:
-            self.client = True # Apenas para indicar que temos as chaves
+            self.client = True
             self.headers = {
                 "X-RapidAPI-Key": self.api_key,
                 "X-RapidAPI-Host": self.api_host
             }
             self.base_url = f"https://{self.api_host}"
 
-    def get_flight_data(self, origin: str, destination: str, date_from: str, date_to: str = None):
-        """Busca voos na API do Skyscanner via RapidAPI"""
+    def get_place_id(self, query):
+        """Busca o ID interno do aeroporto (ex: GRU -> 95673462)"""
+        url = f"{self.base_url}/flights/searchAirport"
+        querystring = {"query": query}
+        
+        try:
+            response = requests.get(url, headers=self.headers, params=querystring)
+            if response.status_code == 200:
+                data = response.json()
+                # A API geralmente retorna uma lista de lugares
+                # Pegamos o primeiro resultado que tenha o IATA code igual ao nosso
+                places = data.get("places", []) # Tenta acessar chave 'places'
+                
+                # Se não tiver 'places', pode ser que a resposta seja a lista direta
+                if not places and isinstance(data, list):
+                    places = data
+
+                for place in places:
+                    if place.get("iata") == query:
+                        return {
+                            "skyId": place.get("skyId"),
+                            "entityId": place.get("entityId")
+                        }
+                
+                # Se não achou pelo IATA exato, pega o primeiro da lista
+                if places:
+                    return {
+                        "skyId": places[0].get("skyId"),
+                        "entityId": places[0].get("entityId")
+                    }
+                    
+            return None
+        except Exception as e:
+            print(f"❌ Erro ao buscar ID de {query}: {e}")
+            return None
+
+    def get_flight_data(self, origin_iata, destination_iata, date_from, date_to=None):
+        """Busca voos usando os IDs internos"""
         
         if not self.client:
             return None
 
-        # Endpoint específico para busca de voos
+        # 1. Pegar IDs de Origem e Destino
+        print(f"   🔍 Buscando IDs para {origin_iata} e {destination_iata}...")
+        origin_data = self.get_place_id(origin_iata)
+        dest_data = self.get_place_id(destination_iata)
+
+        if not origin_data or not dest_data:
+            print(f"   ❌ Não conseguiu encontrar IDs válidos para a rota.")
+            return None
+
+        # 2. Buscar Voos com os IDs
         url = f"{self.base_url}/flights/searchFlights"
         
-        # Parâmetros da busca
         querystring = {
-            "fromId": origin,          # ex: GRU
-            "toId": destination,       # ex: LIS
-            "departDate": date_from,   # ex: 2026-05-01
+            "originSkyId": origin_data["skyId"],
+            "originEntityId": origin_data["entityId"],
+            "destinationSkyId": dest_data["skyId"],
+            "destinationEntityId": dest_data["entityId"],
+            "date": date_from,       # A API exige 'date'
+            "cabinClass": "economy",
             "adults": "1",
-            "currency": "BRL",
-            "cabinClass": "economy"
+            "currency": "BRL"
         }
         
+        # Se for ida e volta (opcional, a API pode suportar)
         if date_to:
             querystring["returnDate"] = date_to
 
@@ -47,37 +92,43 @@ class FlightSearch:
             if response.status_code == 200:
                 data = response.json()
                 
-                # ATENÇÃO: A estrutura do JSON varia conforme a API.
-                # Geralmente vem algo como data['data']['itineraries'] ou similar.
-                # Vamos tentar acessar o primeiro preço encontrado.
-                
-                # Tenta acessar o campo de preço (ajuste conforme o JSON real da API)
-                # Muitas APIs retornam uma lista de 'itineraries' ou 'offers'
+                # A estrutura da resposta varia muito. 
+                # Geralmente é data['data']['itineraries'] ou data['itineraries']
                 itineraries = data.get("data", {}).get("itineraries", [])
-                
+                if not itineraries:
+                    itineraries = data.get("itineraries", [])
+
                 if itineraries:
                     best_offer = itineraries[0]
-                    price = best_offer.get("price", {}).get("raw", 0) # Ou 'total'
-                    airline = best_offer.get("legs", [{}])[0].get("carriers", ["Desconhecida"])[0]
+                    # O preço geralmente está em best_offer['price']['raw'] ou similar
+                    price_obj = best_offer.get("price", {})
+                    price = price_obj.get("raw") or price_obj.get("amount")
                     
-                    # Se o preço for muito baixo ou zero, ignora (erro de API)
-                    if price and price > 100:
-                        print(f"✅ Preço encontrado: R$ {price:.2f} ({airline})")
+                    # Companhia aérea
+                    legs = best_offer.get("legs", [])
+                    airline = "Várias"
+                    if legs:
+                        carriers = legs[0].get("carriers", [])
+                        if carriers:
+                            airline = carriers[0].get("name", "Desconhecida")
+
+                    if price:
+                        print(f"   ✅ Preço encontrado: R$ {price:.2f} ({airline})")
                         return {
                             'price': float(price),
                             'airline': airline,
                             'currency': 'BRL'
                         }
                     else:
-                        print(f"⚠️ Preço inválido ({price}) para {origin} → {destination}")
+                        print(f"   ⚠️ Preço não encontrado no JSON.")
                         return None
                 else:
-                    print(f"⚠️ Nenhum voo encontrado para {origin} → {destination}")
+                    print(f"   ⚠️ Nenhum voo encontrado na resposta.")
                     return None
             else:
-                print(f"❌ Erro na API (Status {response.status_code}): {response.text}")
+                print(f"   ❌ Erro na API Voos (Status {response.status_code}): {response.text[:100]}")
                 return None
                 
         except Exception as e:
-            print(f"❌ Erro de conexão: {e}")
+            print(f"   ❌ Erro de conexão: {e}")
             return None
