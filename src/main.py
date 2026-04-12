@@ -1,107 +1,92 @@
 import os
+from supabase import create_client, Client
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
-
-from database import Database
 from flight_search import FlightSearch
-from telegram_bot import TelegramBot
-
-load_dotenv()
 
 class FlightMonitor:
     def __init__(self):
-        self.db = Database()
+        self.supabase_url = os.getenv("SUPABASE_URL")
+        self.supabase_key = os.getenv("SUPABASE_KEY")
+        self.supabase: Client = create_client(self.supabase_url, self.supabase_key)
         self.flight_search = FlightSearch()
-        self.bot = TelegramBot()
-               # Tenta pegar o segredo, mas garante que seja 15 se der erro
-        self.min_drop_percent = 15.0 
+        self.min_drop_percent = float(os.getenv("MIN_PRICE_DROP_PERCENT", 15))
+
+    def get_monitored_routes(self):
+        """Busca todas as rotas que devem ser monitoradas"""
+        response = self.supabase.table("monitored_routes").select("*").execute()
+        return response.data
+
+    def save_price_history(self, route_id: str, price: float, airline: str):
+        """Salva o preço encontrado no histórico"""
         try:
-            val = os.getenv("MIN_PRICE_DROP_PERCENT")
-            if val:
-                self.min_drop_percent = float(val)
-        except:
-            pass
-    
-    def check_route(self, route):
-        """Verifica uma rota específica"""
-        print(f"Verificando: {route['origin']} → {route['destination']}")
+            data = {
+                "route_id": route_id,
+                "price": price,
+                "airline": airline,
+                "currency": "BRL",
+                "found_at": datetime.now().isoformat()
+            }
+            self.supabase.table("price_history").insert(data).execute()
+            print(f"💾 Preço salvo no banco: R$ {price:.2f}")
+        except Exception as e:
+            print(f"❌ Erro ao salvar no banco: {e}")
+
+    def check_alerts(self, route_id: str, current_price: float, max_price: float):
+        """Verifica se o preço caiu o suficiente para alertar"""
+        drop_percentage = ((max_price - current_price) / max_price) * 100
         
-        # Define datas (padrão: daqui a 30 dias para 7 dias de viagem)
-        departure = route.get('departure_date') or (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d')
-        return_date = route.get('return_date') or (datetime.now() + timedelta(days=37)).strftime('%Y-%m-%d')
-        
-        # Garante formato de data string
-        if isinstance(departure, datetime):
-            departure = departure.strftime('%Y-%m-%d')
-        if isinstance(return_date, datetime):
-            return_date = return_date.strftime('%Y-%m-%d')
-        
-        # Busca voos
-        flight = self.flight_search.search_flights(
-            origin=route['origin'],
-            destination=route['destination'],
-            departure_date=departure,
-            return_date=return_date
-        )
-        
-        if not flight:
-            print("Nenhum voo encontrado")
-            return
-        
-        # Salva preço no histórico
-        self.db.save_price(
-            route_id=route['id'],
-            price=flight['price'],
-            airline=flight['airline']
-        )
-        
-        # Pega último preço para comparação
-        last_price = self.db.get_last_price(route['id'])
-        
-        # Lógica de alerta
-        is_good_deal = False
-        
-        # Se tem preço máximo definido e bateu a meta
-        if route.get('max_price') and flight['price'] <= route['max_price']:
-            is_good_deal = True
-            print(f"✅ Preço abaixo do máximo! R$ {flight['price']} <= R$ {route['max_price']}")
-        
-        # Se o preço caiu consideravelmente em relação à última busca
-        if last_price:
-            drop_percent = ((last_price - flight['price']) / last_price) * 100
-            if drop_percent >= self.min_drop_percent:
-                is_good_deal = True
-                print(f"✅ Queda de {drop_percent:.1f}% detectada!")
-        
-        # Envia alerta
-        if is_good_deal:
-            message_id = self.bot.send_flight_alert(
-                origin=route['origin'],
-                destination=route['destination'],
-                price=flight['price'],
-                airline=flight['airline'],
-                departure=departure,
-                old_price=last_price
-            )
-            
-            if message_id:
-                self.db.save_alert(route['id'], flight['price'], message_id)
-                print(f"📢 Alerta enviado!")
-    
+        if drop_percentage >= self.min_drop_percent:
+            print(f"🔥 OFERTA! Queda de {drop_percentage:.1f}% na rota {route_id}")
+            # Aqui poderíamos salvar na tabela de alertas ou enviar email
+            try:
+                alert_data = {
+                    "route_id": route_id,
+                    "price": current_price,
+                    "message": f"Preço caiu {drop_percentage:.1f}%! De R$ {max_price:.2f} para R$ {current_price:.2f}",
+                    "sent_at": datetime.now().isoformat()
+                }
+                self.supabase.table("alerts_sent").insert(alert_data).execute()
+            except Exception as e:
+                print(f"❌ Erro ao salvar alerta: {e}")
+
     def run(self):
-        """Executa o monitoramento de todas as rotas"""
+        """Loop principal do monitoramento"""
         print(f"🚀 Iniciando monitoramento - {datetime.now()}")
         
-        routes = self.db.get_active_routes()
+        routes = self.get_monitored_routes()
         print(f"📋 {len(routes)} rotas para monitorar")
         
         for route in routes:
+            route_id = route["id"]
+            origin = route["origin"]
+            destination = route["destination"]
+            max_price = route["max_price"]
+            
+            print(f"Verificando: {origin} → {destination}")
+            
             try:
-                self.check_route(route)
+                # CORREÇÃO AQUI: Chamando o método get_flight_data com as datas certas
+                today = datetime.now()
+                date_from = (today + timedelta(days=30)).strftime("%Y-%m-%d")
+                date_to = (today + timedelta(days=37)).strftime("%Y-%m-%d")
+                
+                flight_data = self.flight_search.get_flight_data(origin, destination, date_from, date_to)
+                
+                if flight_data and flight_data.get('price'):
+                    price = flight_data['price']
+                    airline = flight_data.get('airline', 'Desconhecida')
+                    
+                    # Salva no histórico
+                    self.save_price_history(route_id, price, airline)
+                    
+                    # Verifica se é oferta
+                    self.check_alerts(route_id, price, max_price)
+                else:
+                    print(f"⚠️ Nenhum preço válido encontrado para {origin} → {destination}")
+                    
             except Exception as e:
-                print(f"❌ Erro ao verificar rota {route['id']}: {e}")
-                continue
-        
+                print(f"❌ Erro ao verificar rota {route_id}: {e}")
+                
         print("✅ Monitoramento concluído.")
 
 if __name__ == "__main__":
