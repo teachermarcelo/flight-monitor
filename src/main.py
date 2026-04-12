@@ -20,20 +20,48 @@ class FlightMonitor:
             print(f"❌ Erro ao buscar rotas: {e}")
             return []
 
-    def save_price_history(self, route_id: str, price: float, airline: str):
-        """Salva o preço encontrado no histórico"""
-        try:
-            data = {
-                "route_id": route_id,
-                "price": price,
-                "airline": airline,
-                "currency": "BRL",
-                "found_at": datetime.now().isoformat()
-            }
-            self.supabase.table("price_history").insert(data).execute()
-            print(f"   💾 Preço salvo: R$ {price:.2f}")
-        except Exception as e:
-            print(f"   ❌ Erro ao salvar: {e}")
+    def save_price_history(self, route_id: str, price: float, airline: str, 
+                       departure_date: str = None, return_date: str = None):
+    """Salva o preço e gera links de compra"""
+    try:
+        # Busca dados da rota
+        route_response = self.supabase.table("monitored_routes").select(
+            "origin, destination, origin_city, destination_city"
+        ).eq("id", route_id).execute()
+        
+        if not route_response.data:
+            return
+            
+        route = route_response.data[0]
+        origin = route['origin']
+        destination = route['destination']
+        
+        # Gera links de busca
+        if departure_date:
+            links = self.flight_search.generate_booking_links(
+                origin, destination, departure_date, return_date
+            )
+        else:
+            links = {'google_flights': '', 'skyscanner': ''}
+        
+        # Salva no histórico
+        data = {
+            "route_id": route_id,
+            "price": price,
+            "airline": airline,
+            "currency": "BRL",
+            "found_at": datetime.now().isoformat(),
+            "departure_date": departure_date,
+            "return_date": return_date,
+            "google_flights_url": links['google_flights'],
+            "skyscanner_url": links['skyscanner']
+        }
+        
+        self.supabase.table("price_history").insert(data).execute()
+        print(f"   💾 Preço salvo: R$ {price:.2f}")
+        
+    except Exception as e:
+        print(f"   ❌ Erro ao salvar: {e}")
 
     def check_alerts(self, route_id: str, current_price: float, max_price: float):
         """Verifica se o preço caiu o suficiente para alertar"""
