@@ -67,8 +67,8 @@ class FlightMonitor:
             try:
                 # CORREÇÃO AQUI: Chamando o método get_flight_data com as datas certas
                 today = datetime.now()
-                date_from = (today + timedelta(days=30)).strftime("%Y-%m-%d")
-                date_to = (today + timedelta(days=37)).strftime("%Y-%m-%d")
+                date_from = (today + timedelta(days=7)).strftime("%Y-%m-%d")  # Daqui a 7 dias
+date_to = (today + timedelta(days=14)).strftime("%Y-%m-%d")   # Volta após 7 dias
                 
                 flight_data = self.flight_search.get_flight_data(origin, destination, date_from, date_to)
                 
