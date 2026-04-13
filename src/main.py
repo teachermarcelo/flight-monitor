@@ -20,41 +20,15 @@ class FlightMonitor:
             print(f"❌ Erro ao buscar rotas: {e}")
             return []
 
-    def save_price_history(self, route_id: str, price: float, airline: str, 
-                       departure_date: str = None, return_date: str = None):
-        """Salva o preço e gera links de compra"""
+    def save_price_history(self, route_id: str, price: float, airline: str):
+        """Salva o preço no histórico (versão simplificada)"""
         try:
-            # Busca dados da rota
-            route_response = self.supabase.table("monitored_routes").select(
-                "origin, destination, origin_city, destination_city"
-            ).eq("id", route_id).execute()
-            
-            if not route_response.data:
-                return
-                
-            route = route_response.data[0]
-            origin = route['origin']
-            destination = route['destination']
-            
-            # Gera links de busca
-            if departure_date:
-                links = self.flight_search.generate_booking_links(
-                    origin, destination, departure_date, return_date
-                )
-            else:
-                links = {'google_flights': '', 'skyscanner': ''}
-            
-            # Salva no histórico
             data = {
                 "route_id": route_id,
                 "price": price,
                 "airline": airline,
                 "currency": "BRL",
-                "found_at": datetime.now().isoformat(),
-                "departure_date": departure_date,
-                "return_date": return_date,
-                "google_flights_url": links['google_flights'],
-                "skyscanner_url": links['skyscanner']
+                "found_at": datetime.now().isoformat()
             }
             
             self.supabase.table("price_history").insert(data).execute()
@@ -113,8 +87,8 @@ class FlightMonitor:
                     price = flight_data['price']
                     airline = flight_data.get('airline', 'Desconhecida')
                     
-                    # Salva no histórico
-                    self.save_price_history(route_id, price, airline, date_from, date_to)
+                    # Salva no histórico (sem datas e links por enquanto)
+                    self.save_price_history(route_id, price, airline)
                     
                     # Verifica se é oferta
                     self.check_alerts(route_id, price, max_price)
