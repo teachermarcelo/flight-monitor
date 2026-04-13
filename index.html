@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Monitor Pro - Monitoramento de Passagens</title>
+    <title>Flight Monitor Pro - Monitoramento Inteligente</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -22,11 +22,7 @@
             --glass-border: rgba(255, 255, 255, 0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -38,878 +34,236 @@
 
         /* Background animado */
         .bg-pattern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden;
         }
-
         .bg-pattern::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: radial-gradient(ellipse at 20% 50%, rgba(0, 82, 204, 0.15) 0%, transparent 50%),
                         radial-gradient(ellipse at 80% 20%, rgba(0, 184, 217, 0.1) 0%, transparent 50%),
                         radial-gradient(ellipse at 40% 80%, rgba(255, 86, 48, 0.08) 0%, transparent 50%);
             animation: bgMove 20s ease-in-out infinite;
         }
-
         @keyframes bgMove {
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
             33% { transform: translate(30px, -30px) rotate(1deg); }
             66% { transform: translate(-20px, 20px) rotate(-1deg); }
         }
 
-        /* Aviões voando no fundo */
         .flying-plane {
-            position: absolute;
-            font-size: 24px;
-            opacity: 0.1;
-            animation: fly 15s linear infinite;
+            position: absolute; font-size: 24px; opacity: 0.1; animation: fly 15s linear infinite;
         }
+        @keyframes fly { from { transform: translateX(-100vw) translateY(0); } to { transform: translateX(100vw) translateY(-50px); } }
 
-        @keyframes fly {
-            from { transform: translateX(-100vw) translateY(0); }
-            to { transform: translateX(100vw) translateY(-50px); }
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            position: relative;
-            z-index: 1;
-        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
 
         /* Header */
         header {
-            background: rgba(10, 22, 40, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            background: rgba(10, 22, 40, 0.8); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border); padding: 20px 0;
+            position: sticky; top: 0; z-index: 100;
         }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .header-content { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; }
+        .logo { display: flex; align-items: center; gap: 12px; }
         .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
+            width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;
             box-shadow: 0 4px 15px rgba(0, 82, 204, 0.4);
         }
-
         .logo-text h1 {
-            font-size: 24px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #fff, var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 24px; font-weight: 800; background: linear-gradient(135deg, #fff, var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-
-        .logo-text span {
-            font-size: 12px;
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .last-update {
-            font-size: 13px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .last-update i {
-            color: var(--secondary);
-        }
-
+        .logo-text span { font-size: 12px; color: var(--text-secondary); font-weight: 400; }
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .last-update { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+        .last-update i { color: var(--secondary); }
         .btn-refresh {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
+            background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-primary);
+            padding: 10px 20px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 500;
+            display: flex; align-items: center; gap: 8px; transition: all 0.3s;
         }
-
-        .btn-refresh:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 82, 204, 0.4);
-        }
+        .btn-refresh:hover { background: var(--primary); border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 82, 204, 0.4); }
 
         /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 30px 0;
-        }
-
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 30px 0; }
         .stat-card {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 24px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s;
+            background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 24px; position: relative; overflow: hidden; transition: all 0.3s;
         }
+        .stat-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 8px 30px rgba(0, 82, 204, 0.2); }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+        .stat-card.alerts::before { background: linear-gradient(90deg, var(--accent), var(--warning)); }
+        .stat-card.success::before { background: linear-gradient(90deg, var(--success), #00C49A); }
+        .stat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .stat-icon.routes { background: rgba(0, 82, 204, 0.2); color: var(--primary); }
+        .stat-icon.prices { background: rgba(54, 179, 126, 0.2); color: var(--success); }
+        .stat-icon.alerts-icon { background: rgba(255, 86, 48, 0.2); color: var(--accent); }
+        .stat-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 36px; font-weight: 800; line-height: 1; }
+        .stat-change { font-size: 13px; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+        .stat-change.positive { color: var(--success); }
+        .stat-change.negative { color: var(--accent); }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 8px 30px rgba(0, 82, 204, 0.2);
+        /* Custom Alerts Section */
+        .custom-alerts-section {
+            background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 24px; margin-bottom: 24px;
         }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        .alert-form { display: flex; flex-direction: column; gap: 16px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-input, .form-select {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
+            color: var(--text-primary); padding: 12px 16px; border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif;
         }
-
-        .stat-card.alerts::before {
-            background: linear-gradient(90deg, var(--accent), var(--warning));
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.2); }
+        .btn-create-alert {
+            background: linear-gradient(135deg, var(--success), #00C49A); border: none; color: white;
+            padding: 14px 28px; border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; width: fit-content;
         }
-
-        .stat-card.success::before {
-            background: linear-gradient(90deg, var(--success), #00C49A);
+        .btn-create-alert:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(54, 179, 126, 0.4); }
+        .alerts-list { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .alert-item {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border);
+            border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
         }
-
-        .stat-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
+        .alert-info { display: flex; align-items: center; gap: 12px; flex: 1; }
+        .alert-route { font-weight: 700; color: var(--text-primary); }
+        .alert-price { color: var(--success); font-weight: 600; }
+        .btn-delete-alert {
+            background: rgba(255, 86, 48, 0.2); border: 1px solid rgba(255, 86, 48, 0.3);
+            color: var(--accent); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.3s;
         }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .stat-icon.routes {
-            background: rgba(0, 82, 204, 0.2);
-            color: var(--primary);
-        }
-
-        .stat-icon.prices {
-            background: rgba(54, 179, 126, 0.2);
-            color: var(--success);
-        }
-
-        .stat-icon.alerts-icon {
-            background: rgba(255, 86, 48, 0.2);
-            color: var(--accent);
-        }
-
-        .stat-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .stat-value {
-            font-size: 36px;
-            font-weight: 800;
-            line-height: 1;
-        }
-
-        .stat-change {
-            font-size: 13px;
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .stat-change.positive {
-            color: var(--success);
-        }
-
-        .stat-change.negative {
-            color: var(--accent);
-        }
+        .btn-delete-alert:hover { background: var(--accent); color: white; }
 
         /* Filters */
-        .filters-section {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 24px;
-        }
-
-        .filters-grid {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
+        .filters-section { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
+        .filters-grid { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .filter-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-            flex: 1;
-            min-width: 200px;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); color: var(--text-primary);
+            padding: 10px 16px; border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; flex: 1; min-width: 200px;
         }
-
-        .filter-input::placeholder {
-            color: var(--text-secondary);
-        }
-
-        .filter-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.2);
-        }
-
+        .filter-input::placeholder { color: var(--text-secondary); }
+        .filter-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.2); }
         .filter-select {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); color: var(--text-primary);
+            padding: 10px 16px; border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; cursor: pointer;
         }
-
-        .filter-select option {
-            background: var(--bg-card);
-        }
-
+        .filter-select option { background: var(--bg-card); }
         .btn-filter {
-            background: var(--primary);
-            border: none;
-            color: white;
-            padding: 10px 24px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
+            background: var(--primary); border: none; color: white; padding: 10px 24px; border-radius: 10px;
+            cursor: pointer; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: all 0.3s;
         }
-
-        .btn-filter:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 82, 204, 0.4);
-        }
+        .btn-filter:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 82, 204, 0.4); }
 
         /* Rotas Grid */
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title i {
-            color: var(--secondary);
-        }
-
-        .routes-count {
-            background: var(--glass);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            border: 1px solid var(--glass-border);
-        }
-
-        .routes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-            gap: 20px;
-            padding-bottom: 40px;
-        }
-
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+        .section-title { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: var(--secondary); }
+        .routes-count { background: var(--glass); padding: 6px 14px; border-radius: 20px; font-size: 13px; color: var(--text-secondary); border: 1px solid var(--glass-border); }
+        .routes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 20px; padding-bottom: 40px; }
         .route-card {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.3s;
-            position: relative;
+            background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--glass-border);
+            border-radius: 16px; overflow: hidden; transition: all 0.3s; position: relative;
         }
-
-        .route-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .route-card.offer {
-            border-color: var(--success);
-            box-shadow: 0 4px 20px rgba(54, 179, 126, 0.2);
-        }
-
+        .route-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3); }
+        .route-card.offer { border-color: var(--success); box-shadow: 0 4px 20px rgba(54, 179, 126, 0.2); }
         .route-card.offer::before {
-            content: '🔥 OFERTA';
-            position: absolute;
-            top: 12px;
-            right: -30px;
-            background: var(--success);
-            color: white;
-            padding: 4px 40px;
-            font-size: 11px;
-            font-weight: 700;
-            transform: rotate(45deg);
-            z-index: 2;
+            content: '🔥 OFERTA'; position: absolute; top: 12px; right: -30px; background: var(--success);
+            color: white; padding: 4px 40px; font-size: 11px; font-weight: 700; transform: rotate(45deg); z-index: 2;
         }
-
-        .route-card-header {
-            background: linear-gradient(135deg, rgba(0, 82, 204, 0.3), rgba(0, 184, 217, 0.1));
-            padding: 20px;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .route-path {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .route-city {
-            text-align: center;
-        }
-
-        .route-city .code {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--text-primary);
-        }
-
-        .route-city .name {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
-        .route-flight-icon {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--secondary);
-        }
-
-        .route-flight-icon i {
-            font-size: 20px;
-        }
-
-        .route-flight-line {
-            width: 60px;
-            height: 2px;
-            background: linear-gradient(90deg, var(--secondary), transparent);
-            position: relative;
-        }
-
+        .route-card-header { background: linear-gradient(135deg, rgba(0, 82, 204, 0.3), rgba(0, 184, 217, 0.1)); padding: 20px; border-bottom: 1px solid var(--glass-border); }
+        .route-path { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .route-city { text-align: center; }
+        .route-city .code { font-size: 28px; font-weight: 800; color: var(--text-primary); }
+        .route-city .name { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .route-flight-icon { display: flex; align-items: center; gap: 8px; color: var(--secondary); }
+        .route-flight-icon i { font-size: 20px; }
+        .route-flight-line { width: 60px; height: 2px; background: linear-gradient(90deg, var(--secondary), transparent); position: relative; }
         .route-flight-line::after {
-            content: '';
-            position: absolute;
-            right: -4px;
-            top: -3px;
-            width: 8px;
-            height: 8px;
-            border-right: 2px solid var(--secondary);
-            border-top: 2px solid var(--secondary);
-            transform: rotate(45deg);
+            content: ''; position: absolute; right: -4px; top: -3px; width: 8px; height: 8px;
+            border-right: 2px solid var(--secondary); border-top: 2px solid var(--secondary); transform: rotate(45deg);
         }
-
-        .route-card-body {
-            padding: 20px;
-        }
-
-        .route-price-section {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .route-current-price {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--success);
-        }
-
-        .route-max-price {
-            text-align: right;
-        }
-
-        .route-max-price .label {
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .route-max-price .value {
-            font-size: 16px;
-            color: var(--text-secondary);
-            text-decoration: line-through;
-        }
-
-        .route-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .route-info-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .route-info-item i {
-            color: var(--secondary);
-            font-size: 14px;
-        }
-
-        .route-info-item strong {
-            color: var(--text-primary);
-        }
-
-        .route-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
+        .route-card-body { padding: 20px; }
+        .route-price-section { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; }
+        .route-current-price { font-size: 28px; font-weight: 800; color: var(--success); }
+        .route-max-price { text-align: right; }
+        .route-max-price .label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .route-max-price .value { font-size: 16px; color: var(--text-secondary); text-decoration: line-through; }
+        .route-info { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+        .route-info-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); }
+        .route-info-item i { color: var(--secondary); font-size: 14px; }
+        .route-info-item strong { color: var(--text-primary); }
+        .route-actions { display: flex; gap: 8px; flex-wrap: wrap; }
         .btn-action {
-            flex: 1;
-            min-width: 120px;
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.3s;
-            text-decoration: none;
-            border: none;
+            flex: 1; min-width: 120px; padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.3s; text-decoration: none; border: none;
         }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 82, 204, 0.4); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); color: var(--text-primary); }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--secondary); color: var(--secondary); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #2e9d6e; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(54, 179, 126, 0.4); }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 82, 204, 0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--secondary);
-            color: var(--secondary);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #2e9d6e;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(54, 179, 126, 0.4);
-        }
-
-        /* Loading */
-        .loading-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 60px;
-            gap: 20px;
-        }
-
-        .loading-spinner {
-            width: 48px;
-            height: 48px;
-            border: 3px solid var(--glass-border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .empty-state i {
-            font-size: 64px;
-            color: var(--text-secondary);
-            opacity: 0.3;
-            margin-bottom: 16px;
-        }
-
-        .empty-state h3 {
-            font-size: 18px;
-            margin-bottom: 8px;
-        }
-
-        .empty-state p {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
+        /* Loading & Empty */
+        .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px; gap: 20px; }
+        .loading-spinner { width: 48px; height: 48px; border: 3px solid var(--glass-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { color: var(--text-secondary); font-size: 14px; }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state i { font-size: 64px; color: var(--text-secondary); opacity: 0.3; margin-bottom: 16px; }
+        .empty-state h3 { font-size: 18px; margin-bottom: 8px; }
+        .empty-state p { color: var(--text-secondary); font-size: 14px; }
 
         /* Footer */
-        footer {
-            background: rgba(10, 22, 40, 0.8);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--glass-border);
-            padding: 20px 0;
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .footer-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .footer-text {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 16px;
-        }
-
-        .footer-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 13px;
-            transition: color 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: var(--secondary);
-        }
+        footer { background: rgba(10, 22, 40, 0.8); backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); padding: 20px 0; text-align: center; margin-top: 40px; }
+        .footer-content { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .footer-text { font-size: 13px; color: var(--text-secondary); }
+        .footer-links { display: flex; gap: 16px; }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; font-size: 13px; transition: color 0.3s; }
+        .footer-links a:hover { color: var(--secondary); }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .routes-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header-content {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .route-path {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .route-flight-icon {
-                transform: rotate(90deg);
-            }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-dark);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--glass-border);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
+            .routes-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .header-content { flex-direction: column; align-items: flex-start; }
+            .route-path { flex-direction: column; gap: 10px; }
+            .route-flight-icon { transform: rotate(90deg); }
         }
 
         /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .route-card {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-
-        .route-card:nth-child(1) { animation-delay: 0.1s; }
-        .route-card:nth-child(2) { animation-delay: 0.2s; }
-        .route-card:nth-child(3) { animation-delay: 0.3s; }
-        .route-card:nth-child(4) { animation-delay: 0.4s; }
-        .route-card:nth-child(5) { animation-delay: 0.5s; }
-        .route-card:nth-child(6) { animation-delay: 0.6s; }
-        /* Estilos para Alertas Personalizados */
-.custom-alerts-section {
-    background: var(--glass);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 24px;
-}
-
-.alert-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.form-group label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.form-input, .form-select {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--glass-border);
-    color: var(--text-primary);
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-family: 'Inter', sans-serif;
-}
-
-.form-input:focus, .form-select:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.2);
-}
-
-.btn-create-alert {
-    background: linear-gradient(135deg, var(--success), #00C49A);
-    border: none;
-    color: white;
-    padding: 14px 28px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s;
-    width: fit-content;
-}
-
-.btn-create-alert:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(54, 179, 126, 0.4);
-}
-
-.alerts-list {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.alert-item {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.alert-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex: 1;
-}
-
-.alert-route {
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.alert-price {
-    color: var(--success);
-    font-weight: 600;
-}
-
-.btn-delete-alert {
-    background: rgba(255, 86, 48, 0.2);
-    border: 1px solid rgba(255, 86, 48, 0.3);
-    color: var(--accent);
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.3s;
-}
-
-.btn-delete-alert:hover {
-    background: var(--accent);
-    color: white;
-}
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .route-card { animation: fadeIn 0.5s ease-out forwards; }
+        .route-card:nth-child(1) { animation-delay: 0.1s; } .route-card:nth-child(2) { animation-delay: 0.2s; }
+        .route-card:nth-child(3) { animation-delay: 0.3s; } .route-card:nth-child(4) { animation-delay: 0.4s; }
+        .route-card:nth-child(5) { animation-delay: 0.5s; } .route-card:nth-child(6) { animation-delay: 0.6s; }
     </style>
 </head>
 <body>
     <div class="bg-pattern">
         <div class="flying-plane" style="top: 10%; animation-delay: 0s;">✈️</div>
         <div class="flying-plane" style="top: 30%; animation-delay: 5s;">✈️</div>
-        <div class="flying-plane" style="top: 60%; animation-delay: 10s;">✈️</div>
+        <div class="flying-plane" style="top: 60%; animation-delay: 10s;">️</div>
     </div>
 
     <header>
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-plane"></i>
-                    </div>
+                    <div class="logo-icon"><i class="fas fa-plane"></i></div>
                     <div class="logo-text">
                         <h1>Flight Monitor Pro</h1>
                         <span>Monitoramento Inteligente de Passagens</span>
                     </div>
                 </div>
                 <div class="header-actions">
-                    <div class="last-update">
-                        <i class="fas fa-clock"></i>
-                        <span id="lastUpdate">Carregando...</span>
-                    </div>
-                    <button class="btn-refresh" onclick="loadRoutes()">
-                        <i class="fas fa-sync-alt"></i>
-                        Atualizar
-                    </button>
+                    <div class="last-update"><i class="fas fa-clock"></i><span id="lastUpdate">Carregando...</span></div>
+                    <button class="btn-refresh" onclick="loadRoutes()"><i class="fas fa-sync-alt"></i> Atualizar</button>
                 </div>
             </div>
         </div>
@@ -920,137 +274,106 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-header">
-                    <div class="stat-icon routes">
-                        <i class="fas fa-route"></i>
-                    </div>
+                    <div class="stat-icon routes"><i class="fas fa-route"></i></div>
                     <span class="stat-label">Rotas Monitoradas</span>
                 </div>
                 <div class="stat-value" id="totalRoutes">0</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>Rotas ativas</span>
+                <div class="stat-change positive"><i class="fas fa-arrow-up"></i><span>Rotas ativas</span></div>
+            </div>
+            
+            <!-- Seção de Alertas Personalizados -->
+            <div class="custom-alerts-section" style="grid-column: span 2;">
+                <h2 class="section-title" style="margin-bottom: 16px;"><i class="fas fa-bell"></i> Criar Alerta Personalizado</h2>
+                <div class="alert-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Seu Email</label>
+                            <input type="email" id="alertEmail" class="form-input" placeholder="seu@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Origem</label>
+                            <select id="alertOrigin" class="form-select">
+                                <option value="">Selecione...</option>
+                                <option value="GRU">São Paulo (GRU)</option>
+                                <option value="GIG">Rio de Janeiro (GIG)</option>
+                                <option value="BSB">Brasília (BSB)</option>
+                                <option value="CWB">Curitiba (CWB)</option>
+                                <option value="MAO">Manaus (MAO)</option>
+                                <option value="SSA">Salvador (SSA)</option>
+                                <option value="FOR">Fortaleza (FOR)</option>
+                                <option value="REC">Recife (REC)</option>
+                                <option value="POA">Porto Alegre (POA)</option>
+                                <option value="FLN">Florianópolis (FLN)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Destino</label>
+                            <select id="alertDestination" class="form-select">
+                                <option value="">Selecione...</option>
+                                <option value="LIS">Lisboa (LIS)</option>
+                                <option value="MCO">Orlando (MCO)</option>
+                                <option value="MIA">Miami (MIA)</option>
+                                <option value="JFK">Nova York (JFK)</option>
+                                <option value="CDG">Paris (CDG)</option>
+                                <option value="MAD">Madrid (MAD)</option>
+                                <option value="BCN">Barcelona (BCN)</option>
+                                <option value="LHR">Londres (LHR)</option>
+                                <option value="FCO">Roma (FCO)</option>
+                                <option value="AMS">Amsterdã (AMS)</option>
+                                <option value="EZE">Buenos Aires (EZE)</option>
+                                <option value="SCL">Santiago (SCL)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Preço Máximo (R$)</label>
+                            <input type="number" id="alertMaxPrice" class="form-input" placeholder="2000" min="100">
+                        </div>
+                    </div>
+                    <button class="btn-create-alert" onclick="createCustomAlert()">
+                        <i class="fas fa-plus"></i> Criar Alerta
+                    </button>
                 </div>
+                <div id="alertsList" class="alerts-list"></div>
             </div>
-<!-- Seção de Alertas Personalizados -->
-<div class="custom-alerts-section">
-    <h2 class="section-title">
-        <i class="fas fa-bell"></i>
-        Criar Alerta Personalizado
-    </h2>
-    
-    <div class="alert-form">
-        <div class="form-row">
-            <div class="form-group">
-                <label>Seu Email</label>
-                <input type="email" id="alertEmail" class="form-input" placeholder="seu@email.com" required>
-            </div>
-            
-            <div class="form-group">
-                <label>Origem</label>
-                <select id="alertOrigin" class="form-select">
-                    <option value="">Selecione...</option>
-                    <option value="GRU">São Paulo (GRU)</option>
-                    <option value="GIG">Rio de Janeiro (GIG)</option>
-                    <option value="BSB">Brasília (BSB)</option>
-                    <option value="CWB">Curitiba (CWB)</option>
-                    <option value="MAO">Manaus (MAO)</option>
-                    <option value="SSA">Salvador (SSA)</option>
-                    <option value="FOR">Fortaleza (FOR)</option>
-                    <option value="REC">Recife (REC)</option>
-                    <option value="POA">Porto Alegre (POA)</option>
-                    <option value="FLN">Florianópolis (FLN)</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Destino</label>
-                <select id="alertDestination" class="form-select">
-                    <option value="">Selecione...</option>
-                    <option value="LIS">Lisboa (LIS)</option>
-                    <option value="MCO">Orlando (MCO)</option>
-                    <option value="MIA">Miami (MIA)</option>
-                    <option value="JFK">Nova York (JFK)</option>
-                    <option value="CDG">Paris (CDG)</option>
-                    <option value="MAD">Madrid (MAD)</option>
-                    <option value="BCN">Barcelona (BCN)</option>
-                    <option value="LHR">Londres (LHR)</option>
-                    <option value="FCO">Roma (FCO)</option>
-                    <option value="AMS">Amsterdã (AMS)</option>
-                    <option value="EZE">Buenos Aires (EZE)</option>
-                    <option value="SCL">Santiago (SCL)</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Preço Máximo (R$)</label>
-                <input type="number" id="alertMaxPrice" class="form-input" placeholder="2000" min="100">
-            </div>
-        </div>
-        
-        <button class="btn-create-alert" onclick="createCustomAlert()">
-            <i class="fas fa-plus"></i>
-            Criar Alerta
-        </button>
-    </div>
-    
-    <div id="alertsList" class="alerts-list">
-        <!-- Lista de alertas ativos aparecerá aqui -->
-    </div>
-</div>
+
             <div class="stat-card success">
                 <div class="stat-header">
-                    <div class="stat-icon prices">
-                        <i class="fas fa-coins"></i>
-                    </div>
+                    <div class="stat-icon prices"><i class="fas fa-coins"></i></div>
                     <span class="stat-label">Preços Rastreados</span>
                 </div>
                 <div class="stat-value" id="totalPrices">0</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Registros no banco</span>
-                </div>
+                <div class="stat-change positive"><i class="fas fa-check-circle"></i><span>Registros no banco</span></div>
             </div>
 
             <div class="stat-card alerts">
                 <div class="stat-header">
-                    <div class="stat-icon alerts-icon">
-                        <i class="fas fa-bell"></i>
-                    </div>
+                    <div class="stat-icon alerts-icon"><i class="fas fa-bell"></i></div>
                     <span class="stat-label">Alertas Enviados</span>
                 </div>
                 <div class="stat-value" id="totalAlerts">0</div>
-                <div class="stat-change negative">
-                    <i class="fas fa-fire"></i>
-                    <span>Ofertas detectadas</span>
-                </div>
+                <div class="stat-change negative"><i class="fas fa-fire"></i><span>Ofertas detectadas</span></div>
             </div>
         </div>
 
         <!-- Filters -->
         <div class="filters-section">
             <div class="filters-grid">
-                <input type="text" class="filter-input" id="searchInput" placeholder="🔍 Buscar rota (ex: São Paulo, Lisboa...)" onkeyup="filterRoutes()">
+                <input type="text" class="filter-input" id="searchInput" placeholder=" Buscar rota (ex: São Paulo, Lisboa...)" onkeyup="filterRoutes()">
                 <select class="filter-select" id="originFilter" onchange="filterRoutes()">
-                    <option value="">🛫 Origem</option>
+                    <option value=""> Origem</option>
                 </select>
                 <select class="filter-select" id="statusFilter" onchange="filterRoutes()">
                     <option value="">📊 Status</option>
-                    <option value="offer">🔥 Apenas Ofertas</option>
+                    <option value="offer"> Apenas Ofertas</option>
                     <option value="monitoring">👁️ Monitorando</option>
                 </select>
-                <button class="btn-filter" onclick="filterRoutes()">
-                    <i class="fas fa-filter"></i>
-                    Filtrar
-                </button>
+                <button class="btn-filter" onclick="filterRoutes()"><i class="fas fa-filter"></i> Filtrar</button>
             </div>
         </div>
 
         <!-- Routes -->
         <div class="section-header">
-            <h2 class="section-title">
-                <i class="fas fa-map-marker-alt"></i>
-                Rotas Monitoradas
-            </h2>
+            <h2 class="section-title"><i class="fas fa-map-marker-alt"></i> Rotas Monitoradas</h2>
             <span class="routes-count" id="routesCount">0 rotas encontradas</span>
         </div>
 
@@ -1081,135 +404,73 @@
 
         // Dados das cidades (código IATA -> nome)
         const CITY_NAMES = {
-            'GRU': 'São Paulo',
-            'GIG': 'Rio de Janeiro',
-            'BSB': 'Brasília',
-            'CWB': 'Curitiba',
-            'MAO': 'Manaus',
-            'SSA': 'Salvador',
-            'FOR': 'Fortaleza',
-            'REC': 'Recife',
-            'POA': 'Porto Alegre',
-            'FLN': 'Florianópolis',
-            'CNF': 'Belo Horizonte',
-            'LIS': 'Lisboa',
-            'MCO': 'Orlando',
-            'MIA': 'Miami',
-            'JFK': 'Nova York',
-            'CDG': 'Paris',
-            'MAD': 'Madrid',
-            'BCN': 'Barcelona',
-            'LHR': 'Londres',
-            'FCO': 'Roma',
-            'AMS': 'Amsterdã',
-            'EZE': 'Buenos Aires',
-            'SCL': 'Santiago',
-            'MXP': 'Milão',
-            'OPO': 'Porto',
-            'PUJ': 'Punta Cana',
-            'BRC': 'Bariloche'
+            'GRU': 'São Paulo', 'GIG': 'Rio de Janeiro', 'BSB': 'Brasília', 'CWB': 'Curitiba',
+            'MAO': 'Manaus', 'SSA': 'Salvador', 'FOR': 'Fortaleza', 'REC': 'Recife',
+            'POA': 'Porto Alegre', 'FLN': 'Florianópolis', 'CNF': 'Belo Horizonte',
+            'LIS': 'Lisboa', 'MCO': 'Orlando', 'MIA': 'Miami', 'JFK': 'Nova York',
+            'CDG': 'Paris', 'MAD': 'Madrid', 'BCN': 'Barcelona', 'LHR': 'Londres',
+            'FCO': 'Roma', 'AMS': 'Amsterdã', 'EZE': 'Buenos Aires', 'SCL': 'Santiago',
+            'MXP': 'Milão', 'OPO': 'Porto', 'PUJ': 'Punta Cana', 'BRC': 'Bariloche'
         };
 
+        // Bandeiras Corrigidas
         const COUNTRY_FLAGS = {
-            'LIS': '🇵🇹', 'MCO': '🇺🇸', 'MIA': '🇺🇸', 'JFK': '🇺🇸',
-            'CDG': '🇫🇷', 'MAD': '🇪🇸', 'BCN': '🇪🇸', 'LHR': '🇬🇧',
-            'FCO': '🇮🇹', 'AMS': '🇳🇱', 'EZE': '🇦', 'SCL': '🇱',
-            'MXP': '🇮🇹', 'OPO': '🇵🇹', 'PUJ': '🇩🇴', 'BRC': '🇦🇷',
-            'GRU': '🇧🇷', 'GIG': '🇧🇷', 'BSB': '🇧', 'CWB': '🇷',
-            'MAO': '🇧🇷', 'SSA': '🇧🇷', 'FOR': '🇧🇷', 'REC': '🇧',
-            'POA': '🇧🇷', 'FLN': '🇧🇷', 'CNF': '🇧🇷'
-            'EZE': '🇷',  // Estava apenas '🇦'
-    'SCL': '🇱',  // Estava apenas '🇱'
-    'BSB': '🇧',  // Estava apenas ''
-    'CWB': '🇷',  // Estava apenas ''
-    'REC': '🇧🇷',  // Estava apenas '🇧'
+            'LIS': '🇹', 'MCO': '🇺🇸', 'MIA': '🇺🇸', 'JFK': '🇺',
+            'CDG': '🇫🇷', 'MAD': '🇪🇸', 'BCN': '🇪🇸', 'LHR': '🇧',
+            'FCO': '🇮', 'AMS': '🇳🇱', 'EZE': '🇦🇷', 'SCL': '🇨',
+            'MXP': '🇮🇹', 'OPO': '🇵', 'PUJ': '🇩🇴', 'BRC': '🇦',
+            'GRU': '🇷', 'GIG': '🇧🇷', 'BSB': '🇧🇷', 'CWB': '🇧🇷',
+            'MAO': '🇧🇷', 'SSA': '🇧🇷', 'FOR': '🇷', 'REC': '🇧',
+            'POA': '🇧🇷', 'FLN': '🇧🇷', 'CNF': '🇧'
         };
 
-        // Airline logos/names mapping
         const AIRLINE_NAMES = {
-            'TP': 'TAP Air Portugal',
-            'LA': 'LATAM Airlines',
-            'G3': 'Gol Linhas Aéreas',
-            'AD': 'Azul Linhas Aéreas',
-            'AA': 'American Airlines',
-            'DL': 'Delta Air Lines',
-            'AF': 'Air France',
-            'IB': 'Iberia',
-            'BA': 'British Airways',
-            'KL': 'KLM Royal Dutch Airlines',
-            'LH': 'Lufthansa',
-            'AZ': 'ITA Airways',
-            'VY': 'Vueling',
-            'UX': 'Air Europa',
-            'AR': 'Aerolíneas Argentinas',
-            'H2': 'Sky Airline',
-            'CM': 'Copa Airlines',
-            'AV': 'Avianca'
+            'TP': 'TAP Air Portugal', 'LA': 'LATAM Airlines', 'G3': 'Gol Linhas Aéreas',
+            'AD': 'Azul Linhas Aéreas', 'AA': 'American Airlines', 'DL': 'Delta Air Lines',
+            'AF': 'Air France', 'IB': 'Iberia', 'BA': 'British Airways', 'KL': 'KLM',
+            'LH': 'Lufthansa', 'AZ': 'ITA Airways', 'VY': 'Vueling', 'UX': 'Air Europa',
+            'AR': 'Aerolíneas Argentinas', 'H2': 'Sky Airline', 'CM': 'Copa Airlines', 'AV': 'Avianca'
         };
 
         let allRoutes = [];
+        let latestPricesMap = {}; // Variável global para armazenar preços mapeados
 
-        // Inicializar
-        document.addEventListener('DOMContentLoaded', () => {
-            loadRoutes();
-        });
+        document.addEventListener('DOMContentLoaded', () => { loadRoutes(); });
 
         async function loadRoutes() {
             const container = document.getElementById('routesContainer');
-            container.innerHTML = `
-                <div class="loading-container">
-                    <div class="loading-spinner"></div>
-                    <span class="loading-text">Carregando rotas...</span>
-                </div>
-            `;
+            container.innerHTML = `<div class="loading-container"><div class="loading-spinner"></div><span class="loading-text">Carregando rotas...</span></div>`;
 
             try {
-                // Buscar rotas monitoradas
                 const routesResponse = await fetch(`${SUPABASE_URL}/rest/v1/monitored_routes?select=*&order=max_price.desc`, {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' }
                 });
-
                 const routes = await routesResponse.json();
                 allRoutes = routes;
 
-                // Buscar preços mais recentes
                 const pricesResponse = await fetch(`${SUPABASE_URL}/rest/v1/price_history?select=*&order=found_at.desc`, {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' }
                 });
-
                 const prices = await pricesResponse.json();
 
-                // Buscar alertas
-                const alertsResponse = await fetch(`${SUPABASE_URL}/rest/v1/alerts_sent?select=*&order=sent_at.desc`, {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
+                // Mapear preços por route_id para acesso rápido
+                latestPricesMap = {};
+                prices.forEach(price => { if (!latestPricesMap[price.route_id]) latestPricesMap[price.route_id] = price; });
 
+                const alertsResponse = await fetch(`${SUPABASE_URL}/rest/v1/alerts_sent?select=*&order=sent_at.desc`, {
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' }
+                });
                 const alerts = await alertsResponse.json();
 
-                // Atualizar estatísticas
                 document.getElementById('totalRoutes').textContent = routes.length;
                 document.getElementById('totalPrices').textContent = prices.length;
                 document.getElementById('totalAlerts').textContent = alerts.length;
 
-                // Atualizar último update
                 if (prices.length > 0) {
                     const lastDate = new Date(prices[0].found_at);
                     document.getElementById('lastUpdate').textContent = lastDate.toLocaleString('pt-BR');
                 }
 
-                // Preencher filtro de origem
                 const originFilter = document.getElementById('originFilter');
                 originFilter.innerHTML = '<option value="">🛫 Origem</option>';
                 const origins = [...new Set(routes.map(r => r.origin))];
@@ -1220,18 +481,11 @@
                     originFilter.appendChild(option);
                 });
 
-                // Renderizar rotas
                 renderRoutes(routes, prices);
 
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Erro ao carregar dados</h3>
-                        <p>Verifique sua conexão ou as credenciais do Supabase.</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Erro ao carregar dados</h3><p>Verifique sua conexão ou as credenciais do Supabase.</p></div>`;
             }
         }
 
@@ -1239,27 +493,13 @@
             const container = document.getElementById('routesContainer');
             
             if (routes.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-plane-departure"></i>
-                        <h3>Nenhuma rota encontrada</h3>
-                        <p>Adicione rotas no banco de dados para começar a monitorar.</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-plane-departure"></i><h3>Nenhuma rota encontrada</h3><p>Adicione rotas no banco de dados para começar a monitorar.</p></div>`;
                 return;
             }
 
-            // Mapear preços por route_id
-            const latestPrices = {};
-            prices.forEach(price => {
-                if (!latestPrices[price.route_id]) {
-                    latestPrices[price.route_id] = price;
-                }
-            });
-
             let html = '';
             routes.forEach((route, index) => {
-                const latestPrice = latestPrices[route.id];
+                const latestPrice = latestPricesMap[route.id];
                 const currentPrice = latestPrice ? latestPrice.price : null;
                 const airline = latestPrice ? (AIRLINE_NAMES[latestPrice.airline] || latestPrice.airline || 'N/A') : 'N/A';
                 const isOffer = currentPrice && currentPrice < route.max_price;
@@ -1271,7 +511,6 @@
                 const originFlag = COUNTRY_FLAGS[route.origin] || '';
                 const destFlag = COUNTRY_FLAGS[route.destination] || '';
 
-                // Gerar links
                 const googleFlightsUrl = `https://www.google.com/travel/flights?hl=pt-BR&gl=br&curr=BRL&tt=d&d=${route.origin}&r=${route.destination}`;
                 const skyscannerUrl = `https://www.skyscanner.com.br/transport/flights/${route.origin.toLowerCase()}/${route.destination.toLowerCase()}/?adults=1&children=0&infants=0&cabinclass=economy&rtn=1&preferdirects=false`;
 
@@ -1279,74 +518,29 @@
                     <div class="route-card ${isOffer ? 'offer' : ''}" style="animation-delay: ${index * 0.1}s">
                         <div class="route-card-header">
                             <div class="route-path">
-                                <div class="route-city">
-                                    <div class="code">${originFlag} ${route.origin}</div>
-                                    <div class="name">${originName}</div>
-                                </div>
-                                <div class="route-flight-icon">
-                                    <div class="route-flight-line"></div>
-                                    <i class="fas fa-plane"></i>
-                                </div>
-                                <div class="route-city">
-                                    <div class="code">${destFlag} ${route.destination}</div>
-                                    <div class="name">${destName}</div>
-                                </div>
+                                <div class="route-city"><div class="code">${originFlag} ${route.origin}</div><div class="name">${originName}</div></div>
+                                <div class="route-flight-icon"><div class="route-flight-line"></div><i class="fas fa-plane"></i></div>
+                                <div class="route-city"><div class="code">${destFlag} ${route.destination}</div><div class="name">${destName}</div></div>
                             </div>
                         </div>
                         <div class="route-card-body">
                             <div class="route-price-section">
-                                <div>
-                                    ${currentPrice ? `
-                                        <div class="route-current-price">R$ ${currentPrice.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
-                                    ` : `
-                                        <div class="route-current-price" style="color: var(--text-secondary); font-size: 18px;">Aguardando preço...</div>
-                                    `}
-                                </div>
-                                <div class="route-max-price">
-                                    <div class="label">Preço Máximo</div>
-                                    <div class="value">R$ ${route.max_price.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
-                                </div>
+                                <div>${currentPrice ? `<div class="route-current-price">R$ ${currentPrice.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>` : `<div class="route-current-price" style="color: var(--text-secondary); font-size: 18px;">Aguardando preço...</div>`}</div>
+                                <div class="route-max-price"><div class="label">Preço Máximo</div><div class="value">R$ ${route.max_price.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div></div>
                             </div>
                             
-                            ${isOffer ? `
-                                <div style="background: rgba(54, 179, 126, 0.1); border: 1px solid rgba(54, 179, 126, 0.3); border-radius: 10px; padding: 12px; margin-bottom: 16px;">
-                                    <div style="display: flex; align-items: center; gap: 8px; color: var(--success); font-weight: 600;">
-                                        <i class="fas fa-fire"></i>
-                                        <span>OFERTA! Economia de R$ ${savings.toLocaleString('pt-BR', {minimumFractionDigits: 2})} (${savingsPercent}%)</span>
-                                    </div>
-                                </div>
-                            ` : ''}
+                            ${isOffer ? `<div style="background: rgba(54, 179, 126, 0.1); border: 1px solid rgba(54, 179, 126, 0.3); border-radius: 10px; padding: 12px; margin-bottom: 16px;"><div style="display: flex; align-items: center; gap: 8px; color: var(--success); font-weight: 600;"><i class="fas fa-fire"></i><span>OFERTA! Economia de R$ ${savings.toLocaleString('pt-BR', {minimumFractionDigits: 2})} (${savingsPercent}%)</span></div></div>` : ''}
 
                             <div class="route-info">
-                                <div class="route-info-item">
-                                    <i class="fas fa-plane"></i>
-                                    <strong>${airline}</strong>
-                                </div>
-                                ${latestPrice ? `
-                                    <div class="route-info-item">
-                                        <i class="fas fa-clock"></i>
-                                        <span>${new Date(latestPrice.found_at).toLocaleDateString('pt-BR')}</span>
-                                    </div>
-                                ` : ''}
-                                <div class="route-info-item">
-                                    <i class="fas fa-tag"></i>
-                                    <span>${isOffer ? '🔥 Oferta' : '👁️ Monitorando'}</span>
-                                </div>
+                                <div class="route-info-item"><i class="fas fa-plane"></i><strong>${airline}</strong></div>
+                                ${latestPrice ? `<div class="route-info-item"><i class="fas fa-clock"></i><span>${new Date(latestPrice.found_at).toLocaleDateString('pt-BR')}</span></div>` : ''}
+                                <div class="route-info-item"><i class="fas fa-tag"></i><span>${isOffer ? '🔥 Oferta' : '👁️ Monitorando'}</span></div>
                             </div>
 
                             <div class="route-actions">
-                                <a href="${googleFlightsUrl}" target="_blank" class="btn-action btn-primary">
-                                    <i class="fab fa-google"></i>
-                                    Google Flights
-                                </a>
-                                <a href="${skyscannerUrl}" target="_blank" class="btn-action btn-secondary">
-                                    <i class="fas fa-search"></i>
-                                    Skyscanner
-                                </a>
-                                <button class="btn-action btn-success" onclick="generatePDF('${route.id}', '${originName}', '${destName}', ${currentPrice || 0}, '${airline}')">
-                                    <i class="fas fa-file-pdf"></i>
-                                    PDF
-                                </button>
+                                <a href="${googleFlightsUrl}" target="_blank" class="btn-action btn-primary"><i class="fab fa-google"></i> Google Flights</a>
+                                <a href="${skyscannerUrl}" target="_blank" class="btn-action btn-secondary"><i class="fas fa-search"></i> Skyscanner</a>
+                                <button class="btn-action btn-success" onclick="generatePDF('${route.id}', '${originName}', '${destName}', ${currentPrice || 0}, '${airline}')"><i class="fas fa-file-pdf"></i> PDF</button>
                             </div>
                         </div>
                     </div>
@@ -1357,57 +551,34 @@
             document.getElementById('routesCount').textContent = `${routes.length} rotas encontradas`;
         }
 
-       function filterRoutes() {
-    const search = document.getElementById('searchInput').value.toLowerCase();
-    const origin = document.getElementById('originFilter').value;
-    const status = document.getElementById('statusFilter').value;
+        function filterRoutes() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const origin = document.getElementById('originFilter').value;
+            const status = document.getElementById('statusFilter').value;
 
-    let filtered = allRoutes.filter(route => {
-        const originName = (CITY_NAMES[route.origin] || '').toLowerCase();
-        const destName = (CITY_NAMES[route.destination] || '').toLowerCase();
-        const matchesSearch = !search || 
-            originName.includes(search) || 
-            destName.includes(search) ||
-            route.origin.toLowerCase().includes(search) ||
-            route.destination.toLowerCase().includes(search);
-        
-        const matchesOrigin = !origin || route.origin === origin;
-        
-        let matchesStatus = true;
-        if (status === 'offer') {
-            // Verifica se é oferta comparando com preço atual
-            const latestPrice = latestPrices[route.id];
-            const currentPrice = latestPrice ? latestPrice.price : null;
-            matchesStatus = currentPrice && currentPrice < route.max_price;
-        } else if (status === 'monitoring') {
-            const latestPrice = latestPrices[route.id];
-            const currentPrice = latestPrice ? latestPrice.price : null;
-            matchesStatus = !currentPrice || currentPrice >= route.max_price;
+            let filtered = allRoutes.filter(route => {
+                const originName = (CITY_NAMES[route.origin] || '').toLowerCase();
+                const destName = (CITY_NAMES[route.destination] || '').toLowerCase();
+                const matchesSearch = !search || originName.includes(search) || destName.includes(search) || route.origin.toLowerCase().includes(search) || route.destination.toLowerCase().includes(search);
+                const matchesOrigin = !origin || route.origin === origin;
+                
+                let matchesStatus = true;
+                if (status === 'offer') {
+                    const currentPrice = latestPricesMap[route.id]?.price;
+                    matchesStatus = currentPrice && currentPrice < route.max_price;
+                } else if (status === 'monitoring') {
+                    const currentPrice = latestPricesMap[route.id]?.price;
+                    matchesStatus = !currentPrice || currentPrice >= route.max_price;
+                }
+
+                return matchesSearch && matchesOrigin && matchesStatus;
+            });
+
+            renderRoutes(filtered, []);
         }
 
-        return matchesSearch && matchesOrigin && matchesStatus;
-    });
-
-    renderRoutes(filtered, prices); // Passa os preços também
-}
-
         function generatePDF(routeId, origin, dest, price, airline) {
-            // Criar conteúdo para PDF
-            const content = `
-🔥 ALERTA DE PASSAGENS!
-
-✈️ ${origin} → ${dest}
-💰 Preço: R$ ${price.toFixed(2)}
-🛫 Companhia: ${airline}
-📅 Busca: Próximos 7 dias
-
-🔗 Google Flights: https://www.google.com/travel/flights?d=${routeId.split('-')[0]}&r=${routeId.split('-')[1]}
-🔗 Skyscanner: https://www.skyscanner.com.br
-
-Gerado por Flight Monitor Pro
-            `;
-
-            // Criar blob e download
+            const content = `🔥 ALERTA DE PASSAGENS!\n\n✈️ ${origin} → ${dest}\n💰 Preço: R$ ${price.toFixed(2)}\n🛫 Companhia: ${airline}\n📅 Busca: Próximos 7 dias\n\n🔗 Google Flights: https://www.google.com/travel/flights?d=${routeId.split('-')[0]}&r=${routeId.split('-')[1]}\n Skyscanner: https://www.skyscanner.com.br\n\nGerado por Flight Monitor Pro`;
             const blob = new Blob([content], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1415,139 +586,71 @@ Gerado por Flight Monitor Pro
             a.download = `alerta-${origin}-${dest}.txt`;
             a.click();
             URL.revokeObjectURL(url);
-
-            alert('PDF gerado! (Em breve: PDF formatado com jsPDF)');
+            alert('Arquivo de alerta gerado!');
         }
 
-        // Auto-refresh a cada 5 minutos
         setInterval(loadRoutes, 300000);
-        // Função para criar alerta personalizado
-async function createCustomAlert() {
-    const email = document.getElementById('alertEmail').value;
-    const origin = document.getElementById('alertOrigin').value;
-    const destination = document.getElementById('alertDestination').value;
-    const maxPrice = parseFloat(document.getElementById('alertMaxPrice').value);
-    
-    if (!email || !origin || !destination || !maxPrice) {
-        alert('Por favor, preencha todos os campos!');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/user_alerts`, {
-            method: 'POST',
-            headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=representation'
-            },
-            body: JSON.stringify({
-                user_email: email,
-                origin: origin,
-                destination: destination,
-                max_price: maxPrice,
-                active: true
-            })
-        });
-        
-        if (response.ok) {
-            alert('✅ Alerta criado com sucesso! Você será notificado quando encontrarmos preços abaixo de R$ ' + maxPrice);
-            
-            // Limpar formulário
-            document.getElementById('alertEmail').value = '';
-            document.getElementById('alertMaxPrice').value = '';
-            
-            // Recarregar lista de alertas
-            loadUserAlerts(email);
-        } else {
-            alert('❌ Erro ao criar alerta. Tente novamente.');
-        }
-    } catch (error) {
-        console.error('Erro:', error);
-        alert('❌ Erro de conexão. Verifique sua internet.');
-    }
-}
 
-// Carregar alertas do usuário
-async function loadUserAlerts(email) {
-    if (!email) return;
-    
-    try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/user_alerts?user_email=eq.${email}&active=eq.true`, {
-            headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-            }
-        });
-        
-        const alerts = await response.json();
-        
-        const alertsList = document.getElementById('alertsList');
-        if (alerts.length === 0) {
-            alertsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Nenhum alerta ativo.</p>';
-            return;
-        }
-        
-        let html = '<h3 style="color: var(--text-primary); margin-bottom: 12px;">Seus Alertas Ativos:</h3>';
-        
-        alerts.forEach(alert => {
-            const originName = CITY_NAMES[alert.origin] || alert.origin;
-            const destName = CITY_NAMES[alert.destination] || alert.destination;
-            
-            html += `
-                <div class="alert-item">
-                    <div class="alert-info">
-                        <span class="alert-route">${originName} → ${destName}</span>
-                        <span class="alert-price">Max: R$ ${alert.max_price.toFixed(2)}</span>
-                    </div>
-                    <button class="btn-delete-alert" onclick="deleteAlert('${alert.id}')">
-                        <i class="fas fa-trash"></i> Excluir
-                    </button>
-                </div>
-            `;
-        });
-        
-        alertsList.innerHTML = html;
-        
-    } catch (error) {
-        console.error('Erro ao carregar alertas:', error);
-    }
-}
-
-// Excluir alerta
-async function deleteAlert(alertId) {
-    if (!confirm('Tem certeza que deseja excluir este alerta?')) return;
-    
-    try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/user_alerts?id=eq.${alertId}`, {
-            method: 'DELETE',
-            headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-            }
-        });
-        
-        if (response.ok) {
-            alert('✅ Alerta excluído com sucesso!');
-            // Recarregar lista (precisa do email)
+        // Funções de Alertas Personalizados
+        async function createCustomAlert() {
             const email = document.getElementById('alertEmail').value;
-            if (email) loadUserAlerts(email);
-        } else {
-            alert('❌ Erro ao excluir alerta.');
+            const origin = document.getElementById('alertOrigin').value;
+            const destination = document.getElementById('alertDestination').value;
+            const maxPrice = parseFloat(document.getElementById('alertMaxPrice').value);
+            
+            if (!email || !origin || !destination || !maxPrice) { alert('Por favor, preencha todos os campos!'); return; }
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/user_alerts`, {
+                    method: 'POST',
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+                    body: JSON.stringify({ user_email: email, origin: origin, destination: destination, max_price: maxPrice, active: true })
+                });
+                
+                if (response.ok) {
+                    alert('✅ Alerta criado com sucesso!');
+                    document.getElementById('alertEmail').value = '';
+                    document.getElementById('alertMaxPrice').value = '';
+                    loadUserAlerts(email);
+                } else { alert('❌ Erro ao criar alerta.'); }
+            } catch (error) { console.error('Erro:', error); alert('❌ Erro de conexão.'); }
         }
-    } catch (error) {
-        console.error('Erro:', error);
-        alert('❌ Erro de conexão.');
-    }
-}
 
-// Auto-carregar alertas quando email for preenchido
-document.getElementById('alertEmail')?.addEventListener('blur', function() {
-    if (this.value) {
-        loadUserAlerts(this.value);
-    }
-});
+        async function loadUserAlerts(email) {
+            if (!email) return;
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/user_alerts?user_email=eq.${email}&active=eq.true`, {
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                });
+                const alerts = await response.json();
+                const alertsList = document.getElementById('alertsList');
+                if (alerts.length === 0) { alertsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Nenhum alerta ativo.</p>'; return; }
+                
+                let html = '<h3 style="color: var(--text-primary); margin-bottom: 12px;">Seus Alertas Ativos:</h3>';
+                alerts.forEach(alert => {
+                    const originName = CITY_NAMES[alert.origin] || alert.origin;
+                    const destName = CITY_NAMES[alert.destination] || alert.destination;
+                    html += `<div class="alert-item"><div class="alert-info"><span class="alert-route">${originName} → ${destName}</span><span class="alert-price">Max: R$ ${alert.max_price.toFixed(2)}</span></div><button class="btn-delete-alert" onclick="deleteAlert('${alert.id}')"><i class="fas fa-trash"></i> Excluir</button></div>`;
+                });
+                alertsList.innerHTML = html;
+            } catch (error) { console.error('Erro ao carregar alertas:', error); }
+        }
+
+        async function deleteAlert(alertId) {
+            if (!confirm('Tem certeza que deseja excluir este alerta?')) return;
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/user_alerts?id=eq.${alertId}`, {
+                    method: 'DELETE', headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                });
+                if (response.ok) {
+                    alert('✅ Alerta excluído com sucesso!');
+                    const email = document.getElementById('alertEmail').value;
+                    if (email) loadUserAlerts(email);
+                } else { alert('❌ Erro ao excluir alerta.'); }
+            } catch (error) { console.error('Erro:', error); alert(' Erro de conexão.'); }
+        }
+
+        document.getElementById('alertEmail')?.addEventListener('blur', function() { if (this.value) loadUserAlerts(this.value); });
     </script>
 </body>
 </html>
