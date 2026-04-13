@@ -755,6 +755,131 @@
         .route-card:nth-child(4) { animation-delay: 0.4s; }
         .route-card:nth-child(5) { animation-delay: 0.5s; }
         .route-card:nth-child(6) { animation-delay: 0.6s; }
+        /* Estilos para Alertas Personalizados */
+.custom-alerts-section {
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.alert-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-input, .form-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+}
+
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.2);
+}
+
+.btn-create-alert {
+    background: linear-gradient(135deg, var(--success), #00C49A);
+    border: none;
+    color: white;
+    padding: 14px 28px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s;
+    width: fit-content;
+}
+
+.btn-create-alert:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(54, 179, 126, 0.4);
+}
+
+.alerts-list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.alert-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.alert-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.alert-route {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.alert-price {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.btn-delete-alert {
+    background: rgba(255, 86, 48, 0.2);
+    border: 1px solid rgba(255, 86, 48, 0.3);
+    color: var(--accent);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s;
+}
+
+.btn-delete-alert:hover {
+    background: var(--accent);
+    color: white;
+}
     </style>
 </head>
 <body>
@@ -806,7 +931,72 @@
                     <span>Rotas ativas</span>
                 </div>
             </div>
-
+<!-- Seção de Alertas Personalizados -->
+<div class="custom-alerts-section">
+    <h2 class="section-title">
+        <i class="fas fa-bell"></i>
+        Criar Alerta Personalizado
+    </h2>
+    
+    <div class="alert-form">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Seu Email</label>
+                <input type="email" id="alertEmail" class="form-input" placeholder="seu@email.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Origem</label>
+                <select id="alertOrigin" class="form-select">
+                    <option value="">Selecione...</option>
+                    <option value="GRU">São Paulo (GRU)</option>
+                    <option value="GIG">Rio de Janeiro (GIG)</option>
+                    <option value="BSB">Brasília (BSB)</option>
+                    <option value="CWB">Curitiba (CWB)</option>
+                    <option value="MAO">Manaus (MAO)</option>
+                    <option value="SSA">Salvador (SSA)</option>
+                    <option value="FOR">Fortaleza (FOR)</option>
+                    <option value="REC">Recife (REC)</option>
+                    <option value="POA">Porto Alegre (POA)</option>
+                    <option value="FLN">Florianópolis (FLN)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Destino</label>
+                <select id="alertDestination" class="form-select">
+                    <option value="">Selecione...</option>
+                    <option value="LIS">Lisboa (LIS)</option>
+                    <option value="MCO">Orlando (MCO)</option>
+                    <option value="MIA">Miami (MIA)</option>
+                    <option value="JFK">Nova York (JFK)</option>
+                    <option value="CDG">Paris (CDG)</option>
+                    <option value="MAD">Madrid (MAD)</option>
+                    <option value="BCN">Barcelona (BCN)</option>
+                    <option value="LHR">Londres (LHR)</option>
+                    <option value="FCO">Roma (FCO)</option>
+                    <option value="AMS">Amsterdã (AMS)</option>
+                    <option value="EZE">Buenos Aires (EZE)</option>
+                    <option value="SCL">Santiago (SCL)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Preço Máximo (R$)</label>
+                <input type="number" id="alertMaxPrice" class="form-input" placeholder="2000" min="100">
+            </div>
+        </div>
+        
+        <button class="btn-create-alert" onclick="createCustomAlert()">
+            <i class="fas fa-plus"></i>
+            Criar Alerta
+        </button>
+    </div>
+    
+    <div id="alertsList" class="alerts-list">
+        <!-- Lista de alertas ativos aparecerá aqui -->
+    </div>
+</div>
             <div class="stat-card success">
                 <div class="stat-header">
                     <div class="stat-icon prices">
@@ -1222,6 +1412,133 @@ Gerado por Flight Monitor Pro
 
         // Auto-refresh a cada 5 minutos
         setInterval(loadRoutes, 300000);
+        // Função para criar alerta personalizado
+async function createCustomAlert() {
+    const email = document.getElementById('alertEmail').value;
+    const origin = document.getElementById('alertOrigin').value;
+    const destination = document.getElementById('alertDestination').value;
+    const maxPrice = parseFloat(document.getElementById('alertMaxPrice').value);
+    
+    if (!email || !origin || !destination || !maxPrice) {
+        alert('Por favor, preencha todos os campos!');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/user_alerts`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+                user_email: email,
+                origin: origin,
+                destination: destination,
+                max_price: maxPrice,
+                active: true
+            })
+        });
+        
+        if (response.ok) {
+            alert('✅ Alerta criado com sucesso! Você será notificado quando encontrarmos preços abaixo de R$ ' + maxPrice);
+            
+            // Limpar formulário
+            document.getElementById('alertEmail').value = '';
+            document.getElementById('alertMaxPrice').value = '';
+            
+            // Recarregar lista de alertas
+            loadUserAlerts(email);
+        } else {
+            alert('❌ Erro ao criar alerta. Tente novamente.');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('❌ Erro de conexão. Verifique sua internet.');
+    }
+}
+
+// Carregar alertas do usuário
+async function loadUserAlerts(email) {
+    if (!email) return;
+    
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/user_alerts?user_email=eq.${email}&active=eq.true`, {
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            }
+        });
+        
+        const alerts = await response.json();
+        
+        const alertsList = document.getElementById('alertsList');
+        if (alerts.length === 0) {
+            alertsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Nenhum alerta ativo.</p>';
+            return;
+        }
+        
+        let html = '<h3 style="color: var(--text-primary); margin-bottom: 12px;">Seus Alertas Ativos:</h3>';
+        
+        alerts.forEach(alert => {
+            const originName = CITY_NAMES[alert.origin] || alert.origin;
+            const destName = CITY_NAMES[alert.destination] || alert.destination;
+            
+            html += `
+                <div class="alert-item">
+                    <div class="alert-info">
+                        <span class="alert-route">${originName} → ${destName}</span>
+                        <span class="alert-price">Max: R$ ${alert.max_price.toFixed(2)}</span>
+                    </div>
+                    <button class="btn-delete-alert" onclick="deleteAlert('${alert.id}')">
+                        <i class="fas fa-trash"></i> Excluir
+                    </button>
+                </div>
+            `;
+        });
+        
+        alertsList.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Erro ao carregar alertas:', error);
+    }
+}
+
+// Excluir alerta
+async function deleteAlert(alertId) {
+    if (!confirm('Tem certeza que deseja excluir este alerta?')) return;
+    
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/user_alerts?id=eq.${alertId}`, {
+            method: 'DELETE',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            }
+        });
+        
+        if (response.ok) {
+            alert('✅ Alerta excluído com sucesso!');
+            // Recarregar lista (precisa do email)
+            const email = document.getElementById('alertEmail').value;
+            if (email) loadUserAlerts(email);
+        } else {
+            alert('❌ Erro ao excluir alerta.');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('❌ Erro de conexão.');
+    }
+}
+
+// Auto-carregar alertas quando email for preenchido
+document.getElementById('alertEmail')?.addEventListener('blur', function() {
+    if (this.value) {
+        loadUserAlerts(this.value);
+    }
+});
     </script>
 </body>
 </html>
