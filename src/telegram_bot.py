@@ -1,52 +1,69 @@
 import os
 import requests
-from dotenv import load_dotenv
+from datetime import datetime
 
-load_dotenv()
-
-class TelegramBot:
+class TelegramAlertBot:
     def __init__(self):
-        self.token = os.getenv("TELEGRAM_BOT_TOKEN")
+        self.bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
         self.chat_id = os.getenv("TELEGRAM_CHAT_ID")
-        self.base_url = f"https://api.telegram.org/bot{self.token}"
-    
-    def send_message(self, message: str, parse_mode: str = "HTML") -> int:
-        """Envia mensagem para o Telegram"""
-        url = f"{self.base_url}/sendMessage"
-        data = {
-            "chat_id": self.chat_id,
-            "text": message,
-            "parse_mode": parse_mode,
-            "disable_web_page_preview": True
-        }
         
-        response = requests.post(url, json=data)
-        if response.status_code == 200:
-            return response.json()['result']['message_id']
-        return None
-    
-    def send_flight_alert(self, origin: str, destination: str, 
-                          price: float, airline: str, 
-                          departure: str, old_price: float = None):
-        """Envia alerta de promoção formatado"""
-        # Calcula desconto se tiver preço anterior
-        discount = ""
-        if old_price:
-            percent = ((old_price - price) / old_price) * 100
-            discount = f"\n💸 <b>QUEDA DE {percent:.0f}%!</b>\nDe: R$ {old_price:,.2f}"
+        if not self.bot_token or not self.chat_id:
+            print("⚠️ Credenciais do Telegram não configuradas")
+            self.enabled = False
+        else:
+            self.enabled = True
+            self.base_url = f"https://api.telegram.org/bot{self.bot_token}"
+
+    def send_alert(self, route_origin, route_dest, current_price, avg_price, discount_percent, classification, airline, google_link):
+        """Envia alerta formatado profissional para Telegram"""
+        
+        if not self.enabled:
+            print("   ⚠️ Bot do Telegram desativado")
+            return
+
+        # Emoji baseado na classificação
+        emojis = {
+            'ERRO_TARIFA_PROVAVEL': '',
+            'OFERTA_EXCELENTE': '', 
+            'OFERTA_BOA': '✅',
+            'OFERTA_LEVE': ''
+        }
+        emoji = emojis.get(classification, '✈️')
+
+        # Calcula economia
+        savings = avg_price - current_price
         
         message = f"""
-🚨 <b>PROMOÇÃO ENCONTRADA!</b> 🚨
+{emoji} *ALERTA DE PASSAGENS!* {emoji}
 
-✈️ <b>Rota:</b> {origin} → {destination}
-💰 <b>Preço:</b> R$ {price:,.2f}
-🏢 <b>Companhia:</b> {airline}
-📅 <b>Saída:</b> {departure}
-{discount}
+🛫 *{route_origin} → {route_dest}*
+💰 *Preço Atual:* R$ {current_price:,.2f}
+ *Preço Médio:* R$ {avg_price:,.2f}
+🎯 *Economia:* R$ {savings:,.2f} ({discount_percent:.1f}% OFF)
 
-🔗 <a href="https://www.google.com/flights">Buscar no Google Flights</a>
+✈️ *Companhia:* {airline}
+📅 *Data da Busca:* {datetime.now().strftime('%d/%m/%Y %H:%M')}
 
-⚡ <i>Corre que pode acabar!</i>
-        """
-        
-        return self.send_message(message.strip())
+🔗 *Link para Compra:*
+{google_link}
+
+⚡ *Classificação:* {classification}
+"""
+
+        try:
+            url = f"{self.base_url}/sendMessage"
+            data = {
+                "chat_id": self.chat_id,
+                "text": message,
+                "parse_mode": "Markdown"
+            }
+            
+            response = requests.post(url, json=data, timeout=10)
+            
+            if response.status_code == 200:
+                print(f"   ✅ Alerta enviado para Telegram!")
+            else:
+                print(f"   ❌ Erro ao enviar Telegram: {response.text}")
+                
+        except Exception as e:
+            print(f"   ❌ Erro de conexão com Telegram: {e}")
