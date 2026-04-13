@@ -1118,6 +1118,11 @@
             'GRU': '🇧🇷', 'GIG': '🇧🇷', 'BSB': '🇧', 'CWB': '🇷',
             'MAO': '🇧🇷', 'SSA': '🇧🇷', 'FOR': '🇧🇷', 'REC': '🇧',
             'POA': '🇧🇷', 'FLN': '🇧🇷', 'CNF': '🇧🇷'
+            'EZE': '🇷',  // Estava apenas '🇦'
+    'SCL': '🇱',  // Estava apenas '🇱'
+    'BSB': '🇧',  // Estava apenas ''
+    'CWB': '🇷',  // Estava apenas ''
+    'REC': '🇧🇷',  // Estava apenas '🇧'
         };
 
         // Airline logos/names mapping
@@ -1352,35 +1357,39 @@
             document.getElementById('routesCount').textContent = `${routes.length} rotas encontradas`;
         }
 
-        function filterRoutes() {
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const origin = document.getElementById('originFilter').value;
-            const status = document.getElementById('statusFilter').value;
+       function filterRoutes() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const origin = document.getElementById('originFilter').value;
+    const status = document.getElementById('statusFilter').value;
 
-            let filtered = allRoutes.filter(route => {
-                const originName = (CITY_NAMES[route.origin] || '').toLowerCase();
-                const destName = (CITY_NAMES[route.destination] || '').toLowerCase();
-                const matchesSearch = !search || 
-                    originName.includes(search) || 
-                    destName.includes(search) ||
-                    route.origin.toLowerCase().includes(search) ||
-                    route.destination.toLowerCase().includes(search);
-                
-                const matchesOrigin = !origin || route.origin === origin;
-                
-                let matchesStatus = true;
-                if (status === 'offer') {
-                    // Precisa verificar se é oferta
-                    // Simplificado: assume que é oferta se o preço atual < max_price
-                    // Na prática, você precisaria verificar os preços
-                    matchesStatus = true; // Placeholder
-                }
-
-                return matchesSearch && matchesOrigin && matchesStatus;
-            });
-
-            renderRoutes(filtered, []);
+    let filtered = allRoutes.filter(route => {
+        const originName = (CITY_NAMES[route.origin] || '').toLowerCase();
+        const destName = (CITY_NAMES[route.destination] || '').toLowerCase();
+        const matchesSearch = !search || 
+            originName.includes(search) || 
+            destName.includes(search) ||
+            route.origin.toLowerCase().includes(search) ||
+            route.destination.toLowerCase().includes(search);
+        
+        const matchesOrigin = !origin || route.origin === origin;
+        
+        let matchesStatus = true;
+        if (status === 'offer') {
+            // Verifica se é oferta comparando com preço atual
+            const latestPrice = latestPrices[route.id];
+            const currentPrice = latestPrice ? latestPrice.price : null;
+            matchesStatus = currentPrice && currentPrice < route.max_price;
+        } else if (status === 'monitoring') {
+            const latestPrice = latestPrices[route.id];
+            const currentPrice = latestPrice ? latestPrice.price : null;
+            matchesStatus = !currentPrice || currentPrice >= route.max_price;
         }
+
+        return matchesSearch && matchesOrigin && matchesStatus;
+    });
+
+    renderRoutes(filtered, prices); // Passa os preços também
+}
 
         function generatePDF(routeId, origin, dest, price, airline) {
             // Criar conteúdo para PDF
