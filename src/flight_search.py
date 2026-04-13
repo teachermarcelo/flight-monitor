@@ -22,8 +22,8 @@ class FlightSearch:
         # Tabela de preços de referência (fallback realista)
         self.reference_prices = {
             ('GRU', 'LIS'): (2800, 4500),
-            ('GRU', 'MIA'): (2200, 3800),
             ('GRU', 'MCO'): (2300, 3900),
+            ('GRU', 'MIA'): (2200, 3800),
             ('GRU', 'JFK'): (2500, 4200),
             ('GRU', 'CDG'): (2600, 4300),
             ('GRU', 'MAD'): (2400, 4000),
@@ -214,6 +214,40 @@ class FlightSearch:
             'currency': 'BRL'
         }
 
+    def generate_booking_links(self, origin, destination, date_from, date_to):
+        """Gera links de busca para compra"""
+        
+        # Google Flights
+        google_url = (
+            f"https://www.google.com/travel/flights?"
+            f"hl=pt-BR"
+            f"&gl=br"
+            f"&curr=BRL"
+            f"&tt=d"
+            f"&sd={date_from.replace('-', '/')}"
+            f"&ed={date_to.replace('-', '/')}"
+            f"&d={origin}"
+            f"&r={destination}"
+        )
+        
+        # Skyscanner
+        skyscanner_url = (
+            f"https://www.skyscanner.com.br/transport/flights/"
+            f"{origin.lower()}/{destination.lower()}/"
+            f"{date_from.replace('-', '/')}/"
+            f"{date_to.replace('-', '/')}/"
+            f"?adults=1&children=0&adultsv2=1&childrenv2=&"
+            f"infants=0&cabinclass=economy&"
+            f"rtn=1&preferdirects=false&"
+            f"outboundaltsenabled=false&"
+            f"inboundaltsenabled=false&ref=home"
+        )
+        
+        return {
+            'google_flights': google_url,
+            'skyscanner': skyscanner_url
+        }
+
     def get_flight_data(self, origin: str, destination: str, date_from: str, date_to: str = None):
         """
         Método principal: tenta API real, fallback para simulado
@@ -230,36 +264,3 @@ class FlightSearch:
         # Fallback para dados simulados realistas
         print(f"   🔄 Usando dados simulados (API sem dados)")
         return self.get_fallback_price(origin, destination)
-        def generate_booking_links(self, origin, destination, date_from, date_to):
-    """Gera links de busca para compra"""
-    
-    # Google Flights
-    google_url = (
-        f"https://www.google.com/travel/flights?"
-        f"hl=pt-BR"
-        f"&gl=br"
-        f"&curr=BRL"
-        f"&tt=d"
-        f"&sd={date_from.replace('-', '/')}"
-        f"&ed={date_to.replace('-', '/')}"
-        f"&d={origin}"
-        f"&r={destination}"
-    )
-    
-    # Skyscanner
-    skyscanner_url = (
-        f"https://www.skyscanner.com.br/transport/flights/"
-        f"{origin.lower()}/{destination.lower()}/"
-        f"{date_from.replace('-', '/')}/"
-        f"{date_to.replace('-', '/')}/"
-        f"?adults=1&children=0&adultsv2=1&childrenv2=&"
-        f"infants=0&cabinclass=economy&"
-        f"rtn=1&preferdirects=false&"
-        f"outboundaltsenabled=false&"
-        f"inboundaltsenabled=false&ref=home"
-    )
-    
-    return {
-        'google_flights': google_url,
-        'skyscanner': skyscanner_url
-    }
