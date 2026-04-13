@@ -4,73 +4,58 @@ from datetime import datetime, timedelta
 
 class FlightSearch:
     def __init__(self):
-        self.api_key = os.getenv("SERPAPI_KEY")
+        self.api_key = os.getenv("AVIATIONSTACK_KEY")
         
         if not self.api_key:
-            print("❌ ERRO: Chave SERPAPI_KEY não encontrada nos secrets do GitHub!")
+            print("❌ ERRO: Chave AVIATIONSTACK_KEY não encontrada!")
             self.client = None
         else:
             self.client = True
-            self.base_url = "https://serpapi.com/search.json"
+            self.base_url = "http://api.aviationstack.com/v1/flights"
 
     def get_flight_data(self, origin: str, destination: str, date_from: str, date_to: str = None):
-        """Busca voos REAIS usando SerpApi (Google Flights)"""
+        """Busca voos REAIS usando AviationStack"""
         
         if not self.client:
             return None
 
-        print(f"   🔍 Buscando dados REAIS no Google Voos via SerpApi...")
+        print(f"    Buscando dados REAIS via AviationStack...")
 
-        # Parâmetros da requisição para a SerpApi
+        # AviationStack usa parâmetros diferentes
         params = {
-            "engine": "google_flights",
-            "hl": "pt-BR",       # Idioma Português
-            "gl": "br",          # Região Brasil
-            "curr": "BRL",       # Moeda Real
-            "departure_id": origin,
-            "arrival_id": destination,
-            "outbound_date": date_from,
-            "return_date": date_to if date_to else "",
-            "api_key": self.api_key
+            "access_key": self.api_key,
+            "dep_iata": origin,      # Código IATA de partida (ex: GRU)
+            "arr_iata": destination, # Código IATA de chegada (ex: LIS)
+            "limit": 10              # Pega até 10 voos para escolher o melhor
         }
 
         try:
-            response = requests.get(self.base_url, params=params, timeout=20)
+            response = requests.get(self.base_url, params=params, timeout=15)
             
             if response.status_code == 200:
                 data = response.json()
                 
-                # Verifica se há resultados de voos
-                if "flights" in data and len(data["flights"]) > 0:
-                    best_flight = data["flights"][0] # Pega o primeiro (geralmente o mais barato/relevante)
+                if "data" in data and len(data["data"]) > 0:
+                    # Filtra voos que são realmente para a data desejada (ou próximos)
+                    # AviationStack retorna voos programados, precisamos achar o preço
+                    # NOTA: A versão gratuita do AviationStack foca em STATUS de voo, não PREÇO.
+                    # Para PREÇO real gratuito, a melhor opção é voltar para uma simulação MUITO realista
+                    # OU usar a API da "FlightLabs" ou "Amadeus Self-Service" (que tem limite diário).
                     
-                    price_str = best_flight.get("price", "0")
-                    # Remove 'R$' e espaços, converte para float
-                    price_clean = price_str.replace("R$", "").replace(".", "").replace(",", ".").strip()
+                    # CORREÇÃO DE ROTA: AviationStack FREE não dá preço.
+                    # Vamos usar a lógica de "Simulação Híbrida Inteligente" que é a única forma gratuita estável de ter preços variados.
+                    # Mas para atender seu pedido de "Precisão", vamos tentar a Amadeus Self-Service que é a única com preço real grátis.
                     
-                    try:
-                        price = float(price_clean)
-                    except ValueError:
-                        print(f"   ⚠️ Erro ao converter preço: {price_str}")
-                        return None
-
-                    airline = best_flight.get("airlines", ["Desconhecida"])[0] if isinstance(best_flight.get("airlines"), list) else best_flight.get("airlines", "Desconhecida")
-                    
-                    print(f"   ✅ DADO REAL ENCONTRADO: R$ {price:.2f} ({airline})")
-                    
-                    return {
-                        'price': price,
-                        'airline': airline,
-                        'currency': 'BRL',
-                        'source': 'Google Flights (SerpApi)'
-                    }
+                    # Se quiser continuar tentando APIs de preço real, avise.
+                    # Por enquanto, vou retornar None para forçar o fallback ou mudarmos de estratégia.
+                    print(f"   ⚠️ AviationStack Free não fornece preços em tempo real, apenas status.")
+                    return None
                 else:
-                    print(f"   ⚠️ Nenhum voo encontrado no Google para {origin} → {destination}")
+                    print(f"   ⚠️ Nenhum voo encontrado na AviationStack.")
                     return None
             else:
-                print(f"   ❌ Erro na API SerpApi (Status {response.status_code}): {response.text[:100]}")
+                print(f"   ❌ Erro AviationStack: {response.text}")
                 return None
-                
         except Exception as e:
-            print(f"   ❌ Erro de conexão com SerpApi: {e}")
+            print(f"   ❌ Erro: {e}")
             return None
