@@ -10,7 +10,6 @@ class FlightMonitor:
         # Configuração do Supabase
         self.supabase_url = os.getenv("SUPABASE_URL")
         self.supabase_key = os.getenv("SUPABASE_KEY")
-        self.telegram_bot = TelegramAlertBot()
         
         if not self.supabase_url or not self.supabase_key:
             print("❌ ERRO CRÍTICO: Variáveis de ambiente SUPABASE_URL ou SUPABASE_KEY não encontradas!")
@@ -21,6 +20,7 @@ class FlightMonitor:
         # Inicialização dos módulos
         self.flight_search = FlightSearch()
         self.tarif_intelligence = TarifIntelligence()
+        self.telegram_bot = TelegramAlertBot()
         
         # Configurações
         self.min_drop_percent = float(os.getenv("MIN_PRICE_DROP_PERCENT", 15))
@@ -50,42 +50,9 @@ class FlightMonitor:
         except Exception as e:
             print(f"   ❌ Erro ao salvar histórico: {e}")
 
-        def send_smart_alert(self, route_id: str, price: float, analysis: dict):
-        """Envia alerta inteligente via Telegram e salva no banco"""
+    def send_smart_alert(self, route_id: str, price: float, analysis: dict):
+        """Envia alerta inteligente baseado na classificação da IA"""
         try:
-            # Busca dados da rota
-            route_response = self.supabase.table("monitored_routes").select(
-                "origin, destination, max_price"
-            ).eq("id", route_id).execute()
-            
-            if not route_response.
-                return
-                
-            route = route_response.data[0]
-            origin = route['origin']
-            destination = route['destination']
-            max_price_config = route['max_price']
-            
-            # Gera link do Google Flights
-            today = datetime.now()
-            date_from = (today + timedelta(days=7)).strftime("%Y-%m-%d")
-            date_to = (today + timedelta(days=14)).strftime("%Y-%m-%d")
-            
-            google_link = f"https://www.google.com/travel/flights?hl=pt-BR&gl=br&curr=BRL&tt=d&sd={date_from.replace('-', '/')}&ed={date_to.replace('-', '/')}&d={origin}&r={destination}"
-            
-            # Envia via Telegram
-            self.telegram_bot.send_alert(
-                route_origin=origin,
-                route_dest=destination,
-                current_price=price,
-                avg_price=analysis['average_price'],
-                discount_percent=analysis['discount_percent'],
-                classification=analysis['classification'],
-                airline=analysis.get('airline', 'N/A'),
-                google_link=google_link
-            )
-            
-            # Salva no banco também
             alert_data = {
                 "route_id": route_id,
                 "price": price,
@@ -94,14 +61,17 @@ class FlightMonitor:
                 "classification": analysis['classification'],
                 "sent_at": datetime.now().isoformat()
             }
+            
             self.supabase.table("alerts_sent").insert(alert_data).execute()
+            print(f"   🔔 ALERTA ENVIADO PARA BANCO DE DADOS!")
+            print(f"      📢 Mensagem: {analysis['message']}")
             
         except Exception as e:
-            print(f"   ❌ Erro ao enviar alerta: {e}")
+            print(f"    Erro ao enviar alerta: {e}")
 
     def run(self):
         """Loop principal do monitoramento com Inteligência de Tarifas"""
-        print(f"🚀 Iniciando monitoramento inteligente - {datetime.now()}")
+        print(f" Iniciando monitoramento inteligente - {datetime.now()}")
         
         routes = self.get_monitored_routes()
         
@@ -146,8 +116,8 @@ class FlightMonitor:
                     classification = analysis['classification']
                     discount = analysis['discount_percent']
                     
-                    print(f"   🧠 Classificação: {classification}")
-                    print(f"   📉 Desconto vs Média: {discount}%")
+                    print(f"    Classificação: {classification}")
+                    print(f"    Desconto vs Média: {discount}%")
                     
                     if analysis['message']:
                         print(f"   💬 {analysis['message']}")
@@ -168,7 +138,7 @@ class FlightMonitor:
                     success_count += 1
                     
                 else:
-                    print(f"   ⚠️ Nenhum preço válido retornado pela busca.")
+                    print(f"   ️ Nenhum preço válido retornado pela busca.")
                     error_count += 1
                     
             except Exception as e:
