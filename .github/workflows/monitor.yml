@@ -1,10 +1,13 @@
-name: Flight Monitor - Skyscanner
+name: Flight Monitor - SerpApi Real Data
 
 on:
   schedule:
-    # Roda a cada 6 horas (00:00, 06:00, 12:00, 18:00 UTC)
-    - cron: '0 */6 * * *'
-  workflow_dispatch:  # Permite rodar manualmente
+    # Roda 1 vez por dia às 09:00 UTC (aprox. 06:00 no horário de Brasília)
+    # Formato: Minuto Hora Dia Mês DiaSemana
+    - cron: '0 9 * * *'
+  
+  # Permite rodar manualmente pelo botão "Run workflow" no GitHub
+  workflow_dispatch:
 
 jobs:
   monitor:
@@ -24,20 +27,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Flight Monitor
+      - name: Run Flight Monitor with Real Data
         env:
-          # Credenciais da RapidAPI (Skyscanner)
-          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
-          RAPIDAPI_HOST: ${{ secrets.RAPIDAPI_HOST }}
+          # Chave REAL da SerpApi (Google Flights)
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
           
           # Credenciais do Supabase
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           
-          # Configurações
+          # Configuração de sensibilidade de alerta (opcional)
           MIN_PRICE_DROP_PERCENT: 15
         run: |
-          echo "🚀 Iniciando monitoramento de voos..."
-          echo "📅 Data: $(date)"
+          echo " Iniciando monitoramento com DADOS REAIS (SerpApi)..."
+          echo " Data: $(date)"
+          echo "️ Lembre-se: Rodando 1x ao dia para economizar créditos da API."
           cd src
           python main.py
