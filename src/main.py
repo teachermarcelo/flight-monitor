@@ -68,25 +68,43 @@ class FlightMonitor:
         )
         return link
 
-    def send_smart_alert(self, route_id: str, price: float, analysis: dict, origin: str, destination: str, airline: str, date_from: str, date_to: str):
-        """Envia alerta inteligente via Telegram e salva no banco"""
+        def send_smart_alert(self, route_id: str, price: float, analysis: dict, origin: str, destination: str, airline: str, date_from: str, date_to: str):
+        """Envia alerta inteligente via WhatsApp e salva no banco"""
         try:
-            # Gera link do Google Flights
+            # 1. Gera link do Google Flights
             google_link = self.generate_google_flights_link(origin, destination, date_from, date_to)
             
-            # Envia via Telegram
-            self.telegram_bot.send_alert(
-                route_origin=origin,
-                route_dest=destination,
-                current_price=price,
-                avg_price=analysis['average_price'],
-                discount_percent=analysis['discount_percent'],
-                classification=analysis['classification'],
-                airline=airline,
-                google_link=google_link
+            # 2. Prepara a mensagem para o WhatsApp
+            # Formatação: %20 para espaço, %0A para quebra de linha
+            savings = analysis['average_price'] - price
+            discount = analysis['discount_percent']
+            
+            message = (
+                f"🚨 *ALERTA DE OFERTA VIP!* 🚨%0A%0A"
+                f"️ *Rota:* {origin} → {destination}%0A"
+                f"💰 *Preço:* R$ {price:.2f}%0A"
+                f"📉 *Normal:* R$ {analysis['average_price']:.2f}%0A"
+                f" *Economia:* R$ {savings:.2f} ({discount}% OFF)%0A"
+                f"🏢 *Companhia:* {airline}%0A"
+                f"📅 *Datas:* {date_from.replace('-', '/')} a {date_to.replace('-', '/')}%0A%0A"
+                f"🔗 *Link para Comprar:*%0A{google_link}%0A%0A"
+                f"⚡ *Classificação:* {analysis['classification']}"
             )
             
-            # Salva no banco também
+            # Configurações do CallMeBot
+            whatsapp_phone = "554199653041"  # Seu número
+            whatsapp_api_key = "6394803"     # Sua chave API
+            
+            url_whatsapp = f"https://api.callmebot.com/whatsapp.php?phone={whatsapp_phone}&text={message}&apikey={whatsapp_api_key}"
+            
+            # Envia para o WhatsApp
+            resp_wpp = requests.get(url_whatsapp, timeout=10)
+            if resp_wpp.status_code == 200:
+                print(f"   ✅ Alerta enviado para WhatsApp!")
+            else:
+                print(f"   ️ Erro ao enviar WhatsApp: {resp_wpp.text}")
+
+            # 3. Salva no banco de dados (Supabase)
             alert_data = {
                 "route_id": route_id,
                 "price": price,
@@ -97,9 +115,8 @@ class FlightMonitor:
             }
             self.supabase.table("alerts_sent").insert(alert_data).execute()
             
-            print(f"   🔔 ALERTA ENVIADO COM SUCESSO!")
+            print(f"    ALERTA SALVO NO BANCO COM SUCESSO!")
             print(f"      📢 Mensagem: {analysis['message']}")
-            print(f"      🔗 Link: {google_link}")
             
         except Exception as e:
             print(f"    ❌ Erro ao enviar alerta: {e}")
