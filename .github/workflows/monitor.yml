@@ -1,12 +1,11 @@
-name: Flight Monitor - SerpApi Real Data
+name: Flight Monitor - High Frequency
 
 on:
   schedule:
-    # Roda 1 vez por dia às 09:00 UTC (aprox. 06:00 no horário de Brasília)
-    # Formato: Minuto Hora Dia Mês DiaSemana
-    - cron: '0 9 * * *'
+    # Roda a cada 2 horas (00:00, 02:00, 04:00, etc. UTC)
+    # UTC -3h (Brasília) seria: 21:00, 23:00, 01:00, 03:00...
+    - cron: '0 */2 * * *'
   
-  # Permite rodar manualmente pelo botão "Run workflow" no GitHub
   workflow_dispatch:
 
 jobs:
@@ -27,20 +26,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Flight Monitor with Real Data
+      - name: Run Flight Monitor
         env:
-          # Chave REAL da SerpApi (Google Flights)
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
-          
-          # Credenciais do Supabase
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          
-          # Configuração de sensibilidade de alerta (opcional)
-          MIN_PRICE_DROP_PERCENT: 15
         run: |
-          echo " Iniciando monitoramento com DADOS REAIS (SerpApi)..."
-          echo " Data: $(date)"
-          echo "️ Lembre-se: Rodando 1x ao dia para economizar créditos da API."
+          echo "Iniciando varredura intensa..."
           cd src
           python main.py
