@@ -62,7 +62,7 @@ class FlightMonitor:
             discount = analysis['discount_percent']
             
             # ️ COLE SEU LINK DO GRUPO AQUI
-            grupo_vip_link = "https://chat.whatsapp.com/SEU_CODIGO_DO_GRUPO_AQUI" 
+            grupo_vip_link = "https://chat.whatsapp.com/EsFgvs6vuLE83qb9tx5dtn?mode=gi_t" 
             
             message = (
                 f"🚨 *ALERTA VIP DETECTADO!* 🚨%0A%0A"
