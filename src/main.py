@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from supabase import create_client, Client
 from datetime import datetime, timedelta
@@ -46,13 +47,46 @@ class FlightMonitor:
             }
             
             self.supabase.table("price_history").insert(data).execute()
-            # Não imprime aqui para não poluir o log, já que imprimimos na análise
+            # Não imprime aqui para não poluir o log
         except Exception as e:
             print(f"   ❌ Erro ao salvar histórico: {e}")
 
-    def send_smart_alert(self, route_id: str, price: float, analysis: dict):
-        """Envia alerta inteligente baseado na classificação da IA"""
+    def generate_google_flights_link(self, origin, destination, date_from, date_to):
+        """Gera link funcional do Google Flights com datas corretas"""
+        # Formata datas para o formato YYYY/MM/DD que o Google aceita
+        date_from_formatted = date_from.replace('-', '/')
+        date_to_formatted = date_to.replace('-', '/')
+        
+        link = (
+            f"https://www.google.com/travel/flights?"
+            f"hl=pt-BR&gl=br&curr=BRL"
+            f"&tt=d"
+            f"&sd={date_from_formatted}"
+            f"&ed={date_to_formatted}"
+            f"&d={origin}"
+            f"&r={destination}"
+        )
+        return link
+
+    def send_smart_alert(self, route_id: str, price: float, analysis: dict, origin: str, destination: str, airline: str, date_from: str, date_to: str):
+        """Envia alerta inteligente via Telegram e salva no banco"""
         try:
+            # Gera link do Google Flights
+            google_link = self.generate_google_flights_link(origin, destination, date_from, date_to)
+            
+            # Envia via Telegram
+            self.telegram_bot.send_alert(
+                route_origin=origin,
+                route_dest=destination,
+                current_price=price,
+                avg_price=analysis['average_price'],
+                discount_percent=analysis['discount_percent'],
+                classification=analysis['classification'],
+                airline=airline,
+                google_link=google_link
+            )
+            
+            # Salva no banco também
             alert_data = {
                 "route_id": route_id,
                 "price": price,
@@ -61,22 +95,23 @@ class FlightMonitor:
                 "classification": analysis['classification'],
                 "sent_at": datetime.now().isoformat()
             }
-            
             self.supabase.table("alerts_sent").insert(alert_data).execute()
-            print(f"   🔔 ALERTA ENVIADO PARA BANCO DE DADOS!")
+            
+            print(f"   🔔 ALERTA ENVIADO COM SUCESSO!")
             print(f"      📢 Mensagem: {analysis['message']}")
+            print(f"      🔗 Link: {google_link}")
             
         except Exception as e:
-            print(f"    Erro ao enviar alerta: {e}")
+            print(f"    ❌ Erro ao enviar alerta: {e}")
 
     def run(self):
         """Loop principal do monitoramento com Inteligência de Tarifas"""
-        print(f" Iniciando monitoramento inteligente - {datetime.now()}")
+        print(f"🚀 Iniciando monitoramento inteligente - {datetime.now()}")
         
         routes = self.get_monitored_routes()
         
         if not routes:
-            print("️ Nenhuma rota encontrada para monitorar.")
+            print("⚠️ Nenhuma rota encontrada para monitorar.")
             return
 
         print(f"📋 {len(routes)} rotas carregadas para verificação...")
@@ -89,7 +124,7 @@ class FlightMonitor:
                 route_id = route["id"]
                 origin = route["origin"]
                 destination = route["destination"]
-                max_price_config = route["max_price"] # Preço máximo configurado pelo usuário
+                max_price_config = route["max_price"]
                 
                 print(f"\n{'-'*40}")
                 print(f"✈️ Verificando: {origin} → {destination}")
@@ -99,7 +134,7 @@ class FlightMonitor:
                 date_from = (today + timedelta(days=7)).strftime("%Y-%m-%d")
                 date_to = (today + timedelta(days=14)).strftime("%Y-%m-%d")
                 
-                # 1. Busca dados do voo (API ou Simulado)
+                # 1. Busca dados do voo
                 flight_data = self.flight_search.get_flight_data(origin, destination, date_from, date_to)
                 
                 if flight_data and flight_data.get('price'):
@@ -108,37 +143,38 @@ class FlightMonitor:
                     
                     print(f"   💰 Preço Encontrado: R$ {price:.2f} ({airline})")
                     
-                    # 2.  ANÁLISE DE INTELIGÊNCIA DE TARIFA
-                    # Compara o preço atual com a média histórica da rota
+                    # 2. ANÁLISE DE INTELIGÊNCIA DE TARIFA
                     analysis = self.tarif_intelligence.analyze_tarif(origin, destination, price)
                     
-                    # Exibe resultado da análise
                     classification = analysis['classification']
                     discount = analysis['discount_percent']
                     
-                    print(f"    Classificação: {classification}")
-                    print(f"    Desconto vs Média: {discount}%")
+                    print(f"   🧠 Classificação: {classification}")
+                    print(f"   📉 Desconto vs Média: {discount}%")
                     
                     if analysis['message']:
                         print(f"   💬 {analysis['message']}")
                     
-                    # 3. Salva no histórico (sempre salva para treinar a IA)
+                    # 3. Salva no histórico
                     self.save_price_history(route_id, price, airline)
                     
                     # 4. Dispara Alertas Inteligentes
-                    # Só envia alerta se a IA classificou como oferta real (>= 25% ou Erro de Tarifa)
                     if analysis['is_offer']:
                         if classification in ['ERRO_TARIFA_PROVAVEL', 'OFERTA_EXCELENTE', 'OFERTA_BOA']:
-                            self.send_smart_alert(route_id, price, analysis)
+                            self.send_smart_alert(
+                                route_id, price, analysis, 
+                                origin, destination, airline, 
+                                date_from, date_to
+                            )
                         else:
-                            print(f"    Oferta leve detectada, mas abaixo do threshold de alerta crítico.")
+                            print(f"   👍 Oferta leve detectada, mas abaixo do threshold crítico.")
                     else:
                         print(f"   ⚖️ Preço dentro da normalidade de mercado.")
                     
                     success_count += 1
                     
                 else:
-                    print(f"   ️ Nenhum preço válido retornado pela busca.")
+                    print(f"   ⚠️ Nenhum preço válido retornado pela busca.")
                     error_count += 1
                     
             except Exception as e:
