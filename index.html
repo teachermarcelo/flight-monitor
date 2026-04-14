@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Monitor Pro - Monitoramento Inteligente</title>
+    <title>Flight Monitor Pro - Painel Administrativo</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -49,11 +49,6 @@
             66% { transform: translate(-20px, 20px) rotate(-1deg); }
         }
 
-        .flying-plane {
-            position: absolute; font-size: 24px; opacity: 0.1; animation: fly 15s linear infinite;
-        }
-        @keyframes fly { from { transform: translateX(-100vw) translateY(0); } to { transform: translateX(100vw) translateY(-50px); } }
-
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
 
         /* Header */
@@ -84,8 +79,8 @@
         }
         .btn-refresh:hover { background: var(--primary); border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 82, 204, 0.4); }
 
-        /* Stats Cards */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 30px 0; }
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; padding: 30px 0; }
         .stat-card {
             background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--glass-border);
             border-radius: 16px; padding: 24px; position: relative; overflow: hidden; transition: all 0.3s;
@@ -94,6 +89,11 @@
         .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
         .stat-card.alerts::before { background: linear-gradient(90deg, var(--accent), var(--warning)); }
         .stat-card.success::before { background: linear-gradient(90deg, var(--success), #00C49A); }
+        
+        /* Card Clicável para Alertas */
+        .clickable-card { cursor: pointer; border: 2px solid var(--accent); }
+        .clickable-card:hover { background: rgba(255, 86, 48, 0.1); transform: scale(1.02); }
+
         .stat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
         .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .stat-icon.routes { background: rgba(0, 82, 204, 0.2); color: var(--primary); }
@@ -103,9 +103,8 @@
         .stat-value { font-size: 36px; font-weight: 800; line-height: 1; }
         .stat-change { font-size: 13px; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
         .stat-change.positive { color: var(--success); }
-        .stat-change.negative { color: var(--accent); }
 
-        /* Custom Alerts Section */
+        /* Custom Alerts Form Section */
         .custom-alerts-section {
             background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--glass-border);
             border-radius: 16px; padding: 24px; margin-bottom: 24px;
@@ -159,7 +158,7 @@
         }
         .btn-filter:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 82, 204, 0.4); }
 
-        /* Rotas Grid */
+        /* Routes Grid */
         .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
         .section-title { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
         .section-title i { color: var(--secondary); }
@@ -227,28 +226,81 @@
         .footer-links a { color: var(--text-secondary); text-decoration: none; font-size: 13px; transition: color 0.3s; }
         .footer-links a:hover { color: var(--secondary); }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .routes-grid { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: 1fr; }
-            .header-content { flex-direction: column; align-items: flex-start; }
-            .route-path { flex-direction: column; gap: 10px; }
-            .route-flight-icon { transform: rotate(90deg); }
-        }
-
         /* Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .route-card { animation: fadeIn 0.5s ease-out forwards; }
         .route-card:nth-child(1) { animation-delay: 0.1s; } .route-card:nth-child(2) { animation-delay: 0.2s; }
         .route-card:nth-child(3) { animation-delay: 0.3s; } .route-card:nth-child(4) { animation-delay: 0.4s; }
         .route-card:nth-child(5) { animation-delay: 0.5s; } .route-card:nth-child(6) { animation-delay: 0.6s; }
+
+        /* ========================================= */
+        /* ESTILOS DA PÁGINA DE ALERTAS REAIS (MODAL) */
+        /* ========================================= */
+        .alerts-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark); z-index: 2000; overflow-y: auto;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .alerts-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .alerts-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 1rem; }
+        .alerts-header h2 { font-size: 2rem; color: var(--text-primary); display: flex; align-items: center; gap: 12px; }
+        .alerts-header p { color: var(--text-secondary); margin-top: 5px; }
+        .btn-close-alerts { background: transparent; border: 1px solid var(--glass-border); color: var(--text-secondary); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: 0.3s; }
+        .btn-close-alerts:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+        .alerts-filters { display: flex; gap: 12px; margin-bottom: 2rem; flex-wrap: wrap; }
+        .filter-tag { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .filter-tag:hover, .filter-tag.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .alerts-list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+
+        /* Card de Alerta Especial */
+        .alert-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+            border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px;
+            position: relative; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .alert-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-color: var(--primary); }
+        .alert-card.error-fare { border-color: var(--accent); box-shadow: 0 0 15px rgba(255, 86, 48, 0.2); }
+
+        .alert-badge {
+            position: absolute; top: 15px; right: 15px; padding: 5px 12px; border-radius: 12px;
+            font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .badge-error { background: var(--accent); color: white; animation: pulse 2s infinite; }
+        .badge-excellent { background: var(--success); color: white; }
+        .badge-good { background: var(--primary); color: white; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        .alert-route-big { font-size: 24px; font-weight: 800; color: var(--text-primary); margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
+        .alert-price-row { display: flex; align-items: baseline; gap: 12px; margin: 15px 0; }
+        .alert-current-price { font-size: 32px; font-weight: 800; color: var(--success); }
+        .alert-old-price { font-size: 16px; color: var(--text-secondary); text-decoration: line-through; }
+        .alert-savings { font-size: 14px; color: var(--success); font-weight: 600; background: rgba(54, 179, 126, 0.1); padding: 4px 8px; border-radius: 6px; }
+
+        .alert-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; font-size: 13px; color: var(--text-secondary); }
+        .alert-detail-item { display: flex; align-items: center; gap: 6px; }
+        .alert-detail-item i { color: var(--secondary); }
+
+        .alert-actions { display: flex; gap: 10px; }
+        .btn-buy-now {
+            flex: 2; background: var(--success); color: white; border: none; padding: 12px;
+            border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: 0.3s; text-decoration: none;
+        }
+        .btn-buy-now:hover { background: #2e9d6e; transform: scale(1.02); }
+        .btn-share-vip {
+            flex: 1; background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-primary);
+            border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.3s; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-share-vip:hover { background: var(--primary); border-color: var(--primary); color: white; }
     </style>
 </head>
 <body>
     <div class="bg-pattern">
         <div class="flying-plane" style="top: 10%; animation-delay: 0s;">✈️</div>
         <div class="flying-plane" style="top: 30%; animation-delay: 5s;">✈️</div>
-        <div class="flying-plane" style="top: 60%; animation-delay: 10s;">️</div>
+        <div class="flying-plane" style="top: 60%; animation-delay: 10s;">✈️</div>
     </div>
 
     <header>
@@ -258,7 +310,7 @@
                     <div class="logo-icon"><i class="fas fa-plane"></i></div>
                     <div class="logo-text">
                         <h1>Flight Monitor Pro</h1>
-                        <span>Monitoramento Inteligente de Passagens</span>
+                        <span>Painel Administrativo Inteligente</span>
                     </div>
                 </div>
                 <div class="header-actions">
@@ -280,60 +332,18 @@
                 <div class="stat-value" id="totalRoutes">0</div>
                 <div class="stat-change positive"><i class="fas fa-arrow-up"></i><span>Rotas ativas</span></div>
             </div>
-            
-            <!-- Seção de Alertas Personalizados -->
-            <div class="custom-alerts-section" style="grid-column: span 2;">
-                <h2 class="section-title" style="margin-bottom: 16px;"><i class="fas fa-bell"></i> Criar Alerta Personalizado</h2>
-                <div class="alert-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Seu Email</label>
-                            <input type="email" id="alertEmail" class="form-input" placeholder="seu@email.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Origem</label>
-                            <select id="alertOrigin" class="form-select">
-                                <option value="">Selecione...</option>
-                                <option value="GRU">São Paulo (GRU)</option>
-                                <option value="GIG">Rio de Janeiro (GIG)</option>
-                                <option value="BSB">Brasília (BSB)</option>
-                                <option value="CWB">Curitiba (CWB)</option>
-                                <option value="MAO">Manaus (MAO)</option>
-                                <option value="SSA">Salvador (SSA)</option>
-                                <option value="FOR">Fortaleza (FOR)</option>
-                                <option value="REC">Recife (REC)</option>
-                                <option value="POA">Porto Alegre (POA)</option>
-                                <option value="FLN">Florianópolis (FLN)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Destino</label>
-                            <select id="alertDestination" class="form-select">
-                                <option value="">Selecione...</option>
-                                <option value="LIS">Lisboa (LIS)</option>
-                                <option value="MCO">Orlando (MCO)</option>
-                                <option value="MIA">Miami (MIA)</option>
-                                <option value="JFK">Nova York (JFK)</option>
-                                <option value="CDG">Paris (CDG)</option>
-                                <option value="MAD">Madrid (MAD)</option>
-                                <option value="BCN">Barcelona (BCN)</option>
-                                <option value="LHR">Londres (LHR)</option>
-                                <option value="FCO">Roma (FCO)</option>
-                                <option value="AMS">Amsterdã (AMS)</option>
-                                <option value="EZE">Buenos Aires (EZE)</option>
-                                <option value="SCL">Santiago (SCL)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Preço Máximo (R$)</label>
-                            <input type="number" id="alertMaxPrice" class="form-input" placeholder="2000" min="100">
-                        </div>
-                    </div>
-                    <button class="btn-create-alert" onclick="createCustomAlert()">
-                        <i class="fas fa-plus"></i> Criar Alerta
-                    </button>
+
+            <!-- NOVO CARD CLICÁVEL PARA ALERTAS -->
+            <div class="stat-card alerts clickable-card" onclick="openAlertsPage()">
+                <div class="stat-header">
+                    <div class="stat-icon alerts-icon"><i class="fas fa-bell"></i></div>
+                    <span class="stat-label">ALERTAS VIP ATIVOS</span>
                 </div>
-                <div id="alertsList" class="alerts-list"></div>
+                <div class="stat-value" id="activeAlertsCount">0</div>
+                <div class="stat-change positive" style="color: #fff;">
+                    <i class="fas fa-bolt"></i>
+                    <span>Clique para ver ofertas reais</span>
+                </div>
             </div>
 
             <div class="stat-card success">
@@ -347,24 +357,79 @@
 
             <div class="stat-card alerts">
                 <div class="stat-header">
-                    <div class="stat-icon alerts-icon"><i class="fas fa-bell"></i></div>
-                    <span class="stat-label">Alertas Enviados</span>
+                    <div class="stat-icon alerts-icon"><i class="fas fa-history"></i></div>
+                    <span class="stat-label">Total Enviados</span>
                 </div>
-                <div class="stat-value" id="totalAlerts">0</div>
-                <div class="stat-change negative"><i class="fas fa-fire"></i><span>Ofertas detectadas</span></div>
+                <div class="stat-value" id="totalAlertsSent">0</div>
+                <div class="stat-change negative"><i class="fas fa-fire"></i><span>Histórico geral</span></div>
             </div>
+        </div>
+
+        <!-- Seção de Alertas Personalizados (Admin) -->
+        <div class="custom-alerts-section">
+            <h2 class="section-title" style="margin-bottom: 16px;"><i class="fas fa-bell"></i> Criar Alerta Personalizado</h2>
+            <div class="alert-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Seu Email</label>
+                        <input type="email" id="alertEmail" class="form-input" placeholder="seu@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Origem</label>
+                        <select id="alertOrigin" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="GRU">São Paulo (GRU)</option>
+                            <option value="GIG">Rio de Janeiro (GIG)</option>
+                            <option value="BSB">Brasília (BSB)</option>
+                            <option value="CWB">Curitiba (CWB)</option>
+                            <option value="MAO">Manaus (MAO)</option>
+                            <option value="SSA">Salvador (SSA)</option>
+                            <option value="FOR">Fortaleza (FOR)</option>
+                            <option value="REC">Recife (REC)</option>
+                            <option value="POA">Porto Alegre (POA)</option>
+                            <option value="FLN">Florianópolis (FLN)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Destino</label>
+                        <select id="alertDestination" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="LIS">Lisboa (LIS)</option>
+                            <option value="MCO">Orlando (MCO)</option>
+                            <option value="MIA">Miami (MIA)</option>
+                            <option value="JFK">Nova York (JFK)</option>
+                            <option value="CDG">Paris (CDG)</option>
+                            <option value="MAD">Madrid (MAD)</option>
+                            <option value="BCN">Barcelona (BCN)</option>
+                            <option value="LHR">Londres (LHR)</option>
+                            <option value="FCO">Roma (FCO)</option>
+                            <option value="AMS">Amsterdã (AMS)</option>
+                            <option value="EZE">Buenos Aires (EZE)</option>
+                            <option value="SCL">Santiago (SCL)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Preço Máximo (R$)</label>
+                        <input type="number" id="alertMaxPrice" class="form-input" placeholder="2000" min="100">
+                    </div>
+                </div>
+                <button class="btn-create-alert" onclick="createCustomAlert()">
+                    <i class="fas fa-plus"></i> Criar Alerta
+                </button>
+            </div>
+            <div id="alertsList" class="alerts-list"></div>
         </div>
 
         <!-- Filters -->
         <div class="filters-section">
             <div class="filters-grid">
-                <input type="text" class="filter-input" id="searchInput" placeholder=" Buscar rota (ex: São Paulo, Lisboa...)" onkeyup="filterRoutes()">
+                <input type="text" class="filter-input" id="searchInput" placeholder="🔍 Buscar rota (ex: São Paulo, Lisboa...)" onkeyup="filterRoutes()">
                 <select class="filter-select" id="originFilter" onchange="filterRoutes()">
                     <option value=""> Origem</option>
                 </select>
                 <select class="filter-select" id="statusFilter" onchange="filterRoutes()">
-                    <option value="">📊 Status</option>
-                    <option value="offer"> Apenas Ofertas</option>
+                    <option value=""> Status</option>
+                    <option value="offer">🔥 Apenas Ofertas</option>
                     <option value="monitoring">👁️ Monitorando</option>
                 </select>
                 <button class="btn-filter" onclick="filterRoutes()"><i class="fas fa-filter"></i> Filtrar</button>
@@ -385,6 +450,39 @@
         </div>
     </main>
 
+    <!-- PÁGINA DE ALERTAS REAIS (MODAL FULLSCREEN) -->
+    <div id="alertsPage" class="alerts-overlay" style="display: none;">
+        <div class="alerts-container">
+            <!-- Header da Página de Alertas -->
+            <div class="alerts-header">
+                <div>
+                    <h2><i class="fas fa-fire"></i> Central de Ofertas Reais & Erros de Tarifa</h2>
+                    <p>Ofertas detectadas pela nossa IA nos últimos dias. Aja rápido!</p>
+                </div>
+                <button class="btn-close-alerts" onclick="closeAlertsPage()"><i class="fas fa-times"></i></button>
+            </div>
+
+            <!-- Filtros Rápidos -->
+            <div class="alerts-filters">
+                <button class="filter-tag active" onclick="filterAlerts('all')">Todas</button>
+                <button class="filter-tag" onclick="filterAlerts('ERRO_TARIFA_PROVAVEL')">🚨 Erro de Tarifa</button>
+                <button class="filter-tag" onclick="filterAlerts('OFERTA_EXCELENTE')">🔥 Oferta Excelente</button>
+                <button class="filter-tag" onclick="filterAlerts('OFERTA_BOA')">✅ Oferta Boa</button>
+            </div>
+
+            <!-- Lista de Ofertas -->
+            <div id="alertsListContainer" class="alerts-list-grid">
+                <!-- Os cards serão inseridos aqui via JavaScript -->
+            </div>
+            
+            <div id="noAlertsMsg" style="text-align: center; padding: 40px; color: var(--text-secondary); display: none;">
+                <i class="fas fa-check-circle" style="font-size: 48px; margin-bottom: 16px; color: var(--success);"></i>
+                <h3>Tudo limpo por enquanto!</h3>
+                <p>Nenhuma nova oferta extraordinária detectada nas últimas horas.</p>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <div class="container">
             <div class="footer-content">
@@ -402,7 +500,7 @@
         const SUPABASE_URL = 'https://rvgcniaowzmsudzliozf.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2Z2NuaWFvd3ptc3Vkemxpb3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MjQxNzQsImV4cCI6MjA5MTQwMDE3NH0.uwwKFLuK-XyPoXPrB6_CseRTiD9d-iyMQSPWrFw-l-I';
 
-        // Dados das cidades (código IATA -> nome)
+        // Dados das cidades
         const CITY_NAMES = {
             'GRU': 'São Paulo', 'GIG': 'Rio de Janeiro', 'BSB': 'Brasília', 'CWB': 'Curitiba',
             'MAO': 'Manaus', 'SSA': 'Salvador', 'FOR': 'Fortaleza', 'REC': 'Recife',
@@ -413,15 +511,14 @@
             'MXP': 'Milão', 'OPO': 'Porto', 'PUJ': 'Punta Cana', 'BRC': 'Bariloche'
         };
 
-        // Bandeiras Corrigidas
         const COUNTRY_FLAGS = {
-            'LIS': '🇹', 'MCO': '🇺🇸', 'MIA': '🇺🇸', 'JFK': '🇺',
-            'CDG': '🇫🇷', 'MAD': '🇪🇸', 'BCN': '🇪🇸', 'LHR': '🇧',
-            'FCO': '🇮', 'AMS': '🇳🇱', 'EZE': '🇦🇷', 'SCL': '🇨',
+            'LIS': '🇹', 'MCO': '🇺', 'MIA': '🇺', 'JFK': '🇺🇸',
+            'CDG': '🇷', 'MAD': '🇪🇸', 'BCN': '🇸', 'LHR': '🇬🇧',
+            'FCO': '🇮🇹', 'AMS': '🇳', 'EZE': '🇦🇷', 'SCL': '🇨',
             'MXP': '🇮🇹', 'OPO': '🇵', 'PUJ': '🇩🇴', 'BRC': '🇦',
-            'GRU': '🇷', 'GIG': '🇧🇷', 'BSB': '🇧🇷', 'CWB': '🇧🇷',
-            'MAO': '🇧🇷', 'SSA': '🇧🇷', 'FOR': '🇷', 'REC': '🇧',
-            'POA': '🇧🇷', 'FLN': '🇧🇷', 'CNF': '🇧'
+            'GRU': '🇧', 'GIG': '🇧🇷', 'BSB': '🇧🇷', 'CWB': '🇧🇷',
+            'MAO': '🇧🇷', 'SSA': '🇷', 'FOR': '🇧🇷', 'REC': '🇧🇷',
+            'POA': '🇧🇷', 'FLN': '🇧🇷', 'CNF': '🇷'
         };
 
         const AIRLINE_NAMES = {
@@ -433,7 +530,8 @@
         };
 
         let allRoutes = [];
-        let latestPricesMap = {}; // Variável global para armazenar preços mapeados
+        let latestPricesMap = {};
+        let allAlertsData = []; // Variável global para armazenar alertas
 
         document.addEventListener('DOMContentLoaded', () => { loadRoutes(); });
 
@@ -442,35 +540,40 @@
             container.innerHTML = `<div class="loading-container"><div class="loading-spinner"></div><span class="loading-text">Carregando rotas...</span></div>`;
 
             try {
+                // Buscar rotas monitoradas
                 const routesResponse = await fetch(`${SUPABASE_URL}/rest/v1/monitored_routes?select=*&order=max_price.desc`, {
                     headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' }
                 });
                 const routes = await routesResponse.json();
                 allRoutes = routes;
 
+                // Buscar preços mais recentes
                 const pricesResponse = await fetch(`${SUPABASE_URL}/rest/v1/price_history?select=*&order=found_at.desc`, {
                     headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' }
                 });
                 const prices = await pricesResponse.json();
 
-                // Mapear preços por route_id para acesso rápido
+                // Mapear preços por route_id
                 latestPricesMap = {};
                 prices.forEach(price => { if (!latestPricesMap[price.route_id]) latestPricesMap[price.route_id] = price; });
 
+                // Buscar total de alertas enviados (para o card de estatística)
                 const alertsResponse = await fetch(`${SUPABASE_URL}/rest/v1/alerts_sent?select=*&order=sent_at.desc`, {
                     headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' }
                 });
-                const alerts = await alertsResponse.json();
+                const allAlerts = await alertsResponse.json();
+                document.getElementById('totalAlertsSent').textContent = allAlerts.length;
 
+                // Atualizar estatísticas
                 document.getElementById('totalRoutes').textContent = routes.length;
                 document.getElementById('totalPrices').textContent = prices.length;
-                document.getElementById('totalAlerts').textContent = alerts.length;
 
                 if (prices.length > 0) {
                     const lastDate = new Date(prices[0].found_at);
                     document.getElementById('lastUpdate').textContent = lastDate.toLocaleString('pt-BR');
                 }
 
+                // Preencher filtro de origem
                 const originFilter = document.getElementById('originFilter');
                 originFilter.innerHTML = '<option value="">🛫 Origem</option>';
                 const origins = [...new Set(routes.map(r => r.origin))];
@@ -534,7 +637,7 @@
                             <div class="route-info">
                                 <div class="route-info-item"><i class="fas fa-plane"></i><strong>${airline}</strong></div>
                                 ${latestPrice ? `<div class="route-info-item"><i class="fas fa-clock"></i><span>${new Date(latestPrice.found_at).toLocaleDateString('pt-BR')}</span></div>` : ''}
-                                <div class="route-info-item"><i class="fas fa-tag"></i><span>${isOffer ? '🔥 Oferta' : '👁️ Monitorando'}</span></div>
+                                <div class="route-info-item"><i class="fas fa-tag"></i><span>${isOffer ? '🔥 Oferta' : '️ Monitorando'}</span></div>
                             </div>
 
                             <div class="route-actions">
@@ -578,7 +681,7 @@
         }
 
         function generatePDF(routeId, origin, dest, price, airline) {
-            const content = `🔥 ALERTA DE PASSAGENS!\n\n✈️ ${origin} → ${dest}\n💰 Preço: R$ ${price.toFixed(2)}\n🛫 Companhia: ${airline}\n📅 Busca: Próximos 7 dias\n\n🔗 Google Flights: https://www.google.com/travel/flights?d=${routeId.split('-')[0]}&r=${routeId.split('-')[1]}\n Skyscanner: https://www.skyscanner.com.br\n\nGerado por Flight Monitor Pro`;
+            const content = `🔥 ALERTA DE PASSAGENS!\n\n✈️ ${origin} → ${dest}\n💰 Preço: R$ ${price.toFixed(2)}\n🛫 Companhia: ${airline}\n Busca: Próximos 7 dias\n\n Google Flights: https://www.google.com/travel/flights?d=${routeId.split('-')[0]}&r=${routeId.split('-')[1]}\n🔗 Skyscanner: https://www.skyscanner.com.br\n\nGerado por Flight Monitor Pro`;
             const blob = new Blob([content], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -591,7 +694,7 @@
 
         setInterval(loadRoutes, 300000);
 
-        // Funções de Alertas Personalizados
+        // Funções de Alertas Personalizados (Admin)
         async function createCustomAlert() {
             const email = document.getElementById('alertEmail').value;
             const origin = document.getElementById('alertOrigin').value;
@@ -647,10 +750,171 @@
                     const email = document.getElementById('alertEmail').value;
                     if (email) loadUserAlerts(email);
                 } else { alert('❌ Erro ao excluir alerta.'); }
-            } catch (error) { console.error('Erro:', error); alert(' Erro de conexão.'); }
+            } catch (error) { console.error('Erro:', error); alert('❌ Erro de conexão.'); }
         }
 
         document.getElementById('alertEmail')?.addEventListener('blur', function() { if (this.value) loadUserAlerts(this.value); });
+
+        // =====================================================
+        // FUNÇÕES DA PÁGINA DE ALERTAS REAIS (NOVO)
+        // =====================================================
+
+        async function openAlertsPage() {
+            document.getElementById('alertsPage').style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Impede rolagem do fundo
+            
+            // Carrega dados do Supabase se ainda não tiver
+            if (allAlertsData.length === 0) {
+                await fetchAlertsFromSupabase();
+            }
+            renderAlerts(allAlertsData);
+        }
+
+        function closeAlertsPage() {
+            document.getElementById('alertsPage').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        async function fetchAlertsFromSupabase() {
+            try {
+                // Busca os últimos 50 alertas ordenados por data
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/alerts_sent?select=*&order=sent_at.desc&limit=50`, {
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                });
+                
+                const data = await response.json();
+                
+                // Para cada alerta, precisamos buscar os detalhes da rota
+                const alertsWithDetails = await Promise.all(data.map(async (alert) => {
+                    const routeRes = await fetch(`${SUPABASE_URL}/rest/v1/monitored_routes?select=origin,destination,max_price&id=eq.${alert.route_id}`, {
+                        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                    });
+                    const routeData = await routeRes.json();
+                    
+                    if (routeData && routeData.length > 0) {
+                        const route = routeData[0];
+                        return {
+                            ...alert,
+                            origin: route.origin,
+                            destination: route.destination,
+                            max_price: route.max_price,
+                            savings: route.max_price - alert.price,
+                            percent: Math.round(((route.max_price - alert.price) / route.max_price) * 100)
+                        };
+                    }
+                    return null;
+                }));
+
+                allAlertsData = alertsWithDetails.filter(item => item !== null);
+                updateAlertsCount();
+                
+            } catch (error) {
+                console.error("Erro ao buscar alertas:", error);
+            }
+        }
+
+        function updateAlertsCount() {
+            document.getElementById('activeAlertsCount').innerText = allAlertsData.length;
+        }
+
+        function renderAlerts(alerts) {
+            const container = document.getElementById('alertsListContainer');
+            const noMsg = document.getElementById('noAlertsMsg');
+            container.innerHTML = '';
+
+            if (alerts.length === 0) {
+                noMsg.style.display = 'block';
+                return;
+            } else {
+                noMsg.style.display = 'none';
+            }
+
+            alerts.forEach(alert => {
+                let badgeClass = 'badge-good';
+                let cardClass = 'alert-card';
+                let icon = '✅';
+                
+                if (alert.classification === 'ERRO_TARIFA_PROVAVEL') {
+                    badgeClass = 'badge-error';
+                    cardClass += ' error-fare';
+                    icon = '';
+                } else if (alert.classification === 'OFERTA_EXCELENTE') {
+                    badgeClass = 'badge-excellent';
+                    icon = '🔥';
+                }
+
+                // Gera link direto para compra (Google Flights)
+                const today = new Date();
+                const dateFrom = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0].replace(/-/g, '/');
+                const dateTo = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0].replace(/-/g, '/');
+                
+                const buyLink = `https://www.google.com/travel/flights?hl=pt-BR&gl=br&curr=BRL&tt=d&sd=${dateFrom}&ed=${dateTo}&d=${alert.origin}&r=${alert.destination}`;
+                
+                // Link para compartilhar (WhatsApp)
+                const shareText = `🚨 OFERTA IMPERDÍVEL! ${alert.origin} ➝ ${alert.destination} por apenas R$ ${alert.price.toFixed(2)} (${alert.percent}% OFF)! Garanta agora: ${buyLink}`;
+                const shareLink = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+
+                const html = `
+                    <div class="${cardClass}">
+                        <div class="alert-badge ${badgeClass}">${icon} ${alert.classification.replace(/_/g, ' ')}</div>
+                        
+                        <div class="alert-route-big">
+                            ${alert.origin} <i class="fas fa-plane" style="font-size: 16px; color: var(--secondary);"></i> ${alert.destination}
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 14px;">${getCidadeName(alert.origin)} ➝ ${getCidadeName(alert.destination)}</div>
+
+                        <div class="alert-price-row">
+                            <div class="alert-current-price">R$ ${alert.price.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                            <div class="alert-old-price">R$ ${alert.max_price.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                        </div>
+                        <div class="alert-savings">Economia de R$ ${alert.savings.toLocaleString('pt-BR')} (${alert.percent}%)</div>
+
+                        <div class="alert-details">
+                            <div class="alert-detail-item"><i class="fas fa-clock"></i> Detectado há: ${getTimeAgo(alert.sent_at)}</div>
+                            <div class="alert-detail-item"><i class="fas fa-tag"></i> Status: <span style="color: var(--success)">Ativo</span></div>
+                            <div class="alert-detail-item"><i class="fas fa-chart-line"></i> Queda: ${alert.discount_percent.toFixed(1)}%</div>
+                            <div class="alert-detail-item"><i class="fas fa-calendar-check"></i> Validade: 24h</div>
+                        </div>
+
+                        <div class="alert-actions">
+                            <a href="${buyLink}" target="_blank" class="btn-buy-now">
+                                <i class="fas fa-shopping-cart"></i> GARANTIR AGORA
+                            </a>
+                            <a href="${shareLink}" target="_blank" class="btn-share-vip">
+                                <i class="fab fa-whatsapp"></i> Compartilhar
+                            </a>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function filterAlerts(type) {
+            document.querySelectorAll('.filter-tag').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (type === 'all') {
+                renderAlerts(allAlertsData);
+            } else {
+                const filtered = allAlertsData.filter(a => a.classification === type);
+                renderAlerts(filtered);
+            }
+        }
+
+        function getCidadeName(code) {
+            const names = {'GRU': 'São Paulo', 'GIG': 'Rio', 'LIS': 'Lisboa', 'MIA': 'Miami', 'EZE': 'Buenos Aires'};
+            return names[code] || code;
+        }
+
+        function getTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = (now - date) / 1000 / 60; // minutos
+            if (diff < 60) return `${Math.floor(diff)} min atrás`;
+            if (diff < 1440) return `${Math.floor(diff / 60)} horas atrás`;
+            return `${Math.floor(diff / 1440)} dias atrás`;
+        }
     </script>
 </body>
 </html>
