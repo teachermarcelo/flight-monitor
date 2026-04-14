@@ -4,13 +4,13 @@ import requests
 from datetime import datetime
 
 class TelegramAlertBot:
-       def __init__(self):
+    def __init__(self):
         self.bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
         self.chat_id = os.getenv("TELEGRAM_CHAT_ID")
         
-        # DEBUG: Mostra o que o sistema está lendo (oculta parte do token por segurança)
+        # DEBUG: Mostra o que o sistema está lendo
         token_preview = f"{self.bot_token[:10]}..." if self.bot_token else "NENHUM"
-        print(f" DEBUG TELEGRAM: Token = {token_preview} | Chat ID = {self.chat_id}")
+        print(f"🔍 DEBUG TELEGRAM: Token = {token_preview} | Chat ID = {self.chat_id}")
         
         if not self.bot_token or not self.chat_id:
             print("⚠️ Credenciais do Telegram não configuradas ou vazias!")
@@ -19,6 +19,7 @@ class TelegramAlertBot:
             print("✅ Credenciais do Telegram carregadas com sucesso!")
             self.enabled = True
             self.base_url = f"https://api.telegram.org/bot{self.bot_token}"
+
     def send_alert(self, route_origin, route_dest, current_price, avg_price, discount_percent, classification, airline, google_link):
         """Envia alerta formatado profissional para Telegram"""
         
@@ -41,7 +42,7 @@ class TelegramAlertBot:
         message = f"""
 {emoji} *ALERTA DE PASSAGENS!* {emoji}
 
- *{route_origin} → {route_dest}*
+🛫 *{route_origin} → {route_dest}*
 💰 *Preço Atual:* R$ {current_price:,.2f}
  *Preço Médio:* R$ {avg_price:,.2f}
 🎯 *Economia:* R$ {savings:,.2f} ({discount_percent:.1f}% OFF)
