@@ -4,17 +4,21 @@ import requests
 from datetime import datetime
 
 class TelegramAlertBot:
-    def __init__(self):
+       def __init__(self):
         self.bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
         self.chat_id = os.getenv("TELEGRAM_CHAT_ID")
         
+        # DEBUG: Mostra o que o sistema está lendo (oculta parte do token por segurança)
+        token_preview = f"{self.bot_token[:10]}..." if self.bot_token else "NENHUM"
+        print(f" DEBUG TELEGRAM: Token = {token_preview} | Chat ID = {self.chat_id}")
+        
         if not self.bot_token or not self.chat_id:
-            print("⚠️ Credenciais do Telegram não configuradas")
+            print("⚠️ Credenciais do Telegram não configuradas ou vazias!")
             self.enabled = False
         else:
+            print("✅ Credenciais do Telegram carregadas com sucesso!")
             self.enabled = True
             self.base_url = f"https://api.telegram.org/bot{self.bot_token}"
-
     def send_alert(self, route_origin, route_dest, current_price, avg_price, discount_percent, classification, airline, google_link):
         """Envia alerta formatado profissional para Telegram"""
         
