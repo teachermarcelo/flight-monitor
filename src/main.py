@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
+import requests
 from supabase import create_client, Client
 from datetime import datetime, timedelta
 from flight_search import FlightSearch
 from tarif_intelligence import TarifIntelligence
-from telegram_bot import TelegramAlertBot
 
 class FlightMonitor:
     def __init__(self):
@@ -21,7 +21,6 @@ class FlightMonitor:
         # Inicialização dos módulos
         self.flight_search = FlightSearch()
         self.tarif_intelligence = TarifIntelligence()
-        self.telegram_bot = TelegramAlertBot()
         
         # Configurações
         self.min_drop_percent = float(os.getenv("MIN_PRICE_DROP_PERCENT", 15))
@@ -45,15 +44,12 @@ class FlightMonitor:
                 "currency": "BRL",
                 "found_at": datetime.now().isoformat()
             }
-            
             self.supabase.table("price_history").insert(data).execute()
-            # Não imprime aqui para não poluir o log
         except Exception as e:
-            print(f"   ❌ Erro ao salvar histórico: {e}")
+            print(f"    Erro ao salvar histórico: {e}")
 
     def generate_google_flights_link(self, origin, destination, date_from, date_to):
         """Gera link funcional do Google Flights com datas corretas"""
-        # Formata datas para o formato YYYY/MM/DD que o Google aceita
         date_from_formatted = date_from.replace('-', '/')
         date_to_formatted = date_to.replace('-', '/')
         
@@ -68,26 +64,26 @@ class FlightMonitor:
         )
         return link
 
-        def send_smart_alert(self, route_id: str, price: float, analysis: dict, origin: str, destination: str, airline: str, date_from: str, date_to: str):
+    def send_smart_alert(self, route_id: str, price: float, analysis: dict, origin: str, destination: str, airline: str, date_from: str, date_to: str):
         """Envia alerta inteligente via WhatsApp e salva no banco"""
         try:
             # 1. Gera link do Google Flights
             google_link = self.generate_google_flights_link(origin, destination, date_from, date_to)
             
             # 2. Prepara a mensagem para o WhatsApp
-            # Formatação: %20 para espaço, %0A para quebra de linha
             savings = analysis['average_price'] - price
             discount = analysis['discount_percent']
             
+            # Formatação: %20 para espaço, %0A para quebra de linha
             message = (
                 f"🚨 *ALERTA DE OFERTA VIP!* 🚨%0A%0A"
-                f"️ *Rota:* {origin} → {destination}%0A"
+                f"✈️ *Rota:* {origin} → {destination}%0A"
                 f"💰 *Preço:* R$ {price:.2f}%0A"
                 f"📉 *Normal:* R$ {analysis['average_price']:.2f}%0A"
-                f" *Economia:* R$ {savings:.2f} ({discount}% OFF)%0A"
-                f"🏢 *Companhia:* {airline}%0A"
-                f"📅 *Datas:* {date_from.replace('-', '/')} a {date_to.replace('-', '/')}%0A%0A"
-                f"🔗 *Link para Comprar:*%0A{google_link}%0A%0A"
+                f"💸 *Economia:* R$ {savings:.2f} ({discount}% OFF)%0A"
+                f" *Companhia:* {airline}%0A"
+                f" *Datas:* {date_from.replace('-', '/')} a {date_to.replace('-', '/')}%0A%0A"
+                f" *Link para Comprar:*%0A{google_link}%0A%0A"
                 f"⚡ *Classificação:* {analysis['classification']}"
             )
             
@@ -115,11 +111,11 @@ class FlightMonitor:
             }
             self.supabase.table("alerts_sent").insert(alert_data).execute()
             
-            print(f"    ALERTA SALVO NO BANCO COM SUCESSO!")
+            print(f"   🔔 ALERTA SALVO NO BANCO COM SUCESSO!")
             print(f"      📢 Mensagem: {analysis['message']}")
             
         except Exception as e:
-            print(f"    ❌ Erro ao enviar alerta: {e}")
+            print(f"   ❌ Erro ao enviar alerta: {e}")
 
     def run(self):
         """Loop principal do monitoramento com Inteligência de Tarifas"""
@@ -128,10 +124,10 @@ class FlightMonitor:
         routes = self.get_monitored_routes()
         
         if not routes:
-            print("⚠️ Nenhuma rota encontrada para monitorar.")
+            print("️ Nenhuma rota encontrada para monitorar.")
             return
 
-        print(f"📋 {len(routes)} rotas carregadas para verificação...")
+        print(f" {len(routes)} rotas carregadas para verificação...")
         
         success_count = 0
         error_count = 0
@@ -186,7 +182,7 @@ class FlightMonitor:
                         else:
                             print(f"   👍 Oferta leve detectada, mas abaixo do threshold crítico.")
                     else:
-                        print(f"   ⚖️ Preço dentro da normalidade de mercado.")
+                        print(f"   ️ Preço dentro da normalidade de mercado.")
                     
                     success_count += 1
                     
