@@ -1,10 +1,9 @@
-name: Flight Monitor - High Frequency
+name: Flight Monitor - Daily Starter
 
 on:
   schedule:
-    # Roda a cada 2 horas (00:00, 02:00, 04:00, etc. UTC)
-    # UTC -3h (Brasília) seria: 21:00, 23:00, 01:00, 03:00...
-    - cron: '0 */2 * * *'
+    # Roda 1 vez por dia às 08:00 UTC (05:00 Brasília)
+    - cron: '0 8 * * *'
   
   workflow_dispatch:
 
@@ -32,6 +31,6 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
-          echo "Iniciando varredura intensa..."
+          echo "Iniciando varredura diária das Top 3 Rotas..."
           cd src
           python main.py
