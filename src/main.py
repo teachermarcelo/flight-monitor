@@ -75,16 +75,19 @@ class FlightMonitor:
             discount = analysis['discount_percent']
             
             # Formatação: %20 para espaço, %0A para quebra de linha
+                       # Formatação: %20 para espaço, %0A para quebra de linha
             message = (
-                f"🚨 *ALERTA DE OFERTA VIP!* 🚨%0A%0A"
+                f" *ALERTA DE OFERTA VIP!* 🚨%0A%0A"
                 f"✈️ *Rota:* {origin} → {destination}%0A"
-                f"💰 *Preço:* R$ {price:.2f}%0A"
-                f"📉 *Normal:* R$ {analysis['average_price']:.2f}%0A"
+                f"💰 *Preço Encontrado:* R$ {price:.2f}%0A"
+                f"📉 *Preço Normal:* R$ {analysis['average_price']:.2f}%0A"
                 f"💸 *Economia:* R$ {savings:.2f} ({discount}% OFF)%0A"
                 f" *Companhia:* {airline}%0A"
-                f" *Datas:* {date_from.replace('-', '/')} a {date_to.replace('-', '/')}%0A%0A"
-                f" *Link para Comprar:*%0A{google_link}%0A%0A"
-                f"⚡ *Classificação:* {analysis['classification']}"
+                f"📅 *Datas:* {date_from.replace('-', '/')} a {date_to.replace('-', '/')}%0A%0A"
+                f"⚠️ *Atenção:* Os preços das passagens mudam rapidamente! Esta oferta pode não estar mais disponível.%0A"
+                f"🔗 *Link para Verificar e Comprar:*%0A{google_link}%0A%0A"
+                f"⚡ *Classificação:* {analysis['classification']}%0A"
+                f"_Enviado por Flight Monitor Pro_"
             )
             
             # Configurações do CallMeBot
