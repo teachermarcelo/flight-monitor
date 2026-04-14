@@ -27,12 +27,10 @@ class FlightMonitor:
         
         # LISTA DE OURO (Alta demanda + Alta chance de erro de tarifa)
         # Focamos nas rotas que seu público mais quer: Europa, EUA e Caribe
-        strategic_routes = [
-            {'id': 'GRU-LIS', 'origin': 'GRU', 'destination': 'LIS', 'max_price': 4500}, # Lisboa (Clássico)
-            {'id': 'GRU-MIA', 'origin': 'GRU', 'destination': 'MIA', 'max_price': 3800}, # Miami (Compras)
-            {'id': 'GRU-CUN', 'origin': 'GRU', 'destination': 'CUN', 'max_price': 3200}, # Cancún (Férias)
-            {'id': 'GIG-LIS', 'origin': 'GIG', 'destination': 'LIS', 'max_price': 4200}, # Rio-Lisboa
-            {'id': 'GRU-EZE', 'origin': 'GRU', 'destination': 'EZE', 'max_price': 1800}  # Buenos Aires (Curta dist.)
+       strategic_routes = [
+    {'id': 'GRU-LIS', 'origin': 'GRU', 'destination': 'LIS', 'max_price': 4500},
+    {'id': 'GRU-MIA', 'origin': 'GRU', 'destination': 'MIA', 'max_price': 3800},
+    {'id': 'GRU-CUN', 'origin': 'GRU', 'destination': 'CUN', 'max_price': 3200}
             # Se quiser adicionar mais, cuidado com o limite de 100 buscas/mês!
             # Cada rota extra = +120 buscas/mês (se rodar a cada 2h)
         ]
