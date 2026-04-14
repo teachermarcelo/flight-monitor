@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import requests
 from datetime import datetime
@@ -8,7 +9,7 @@ class TelegramAlertBot:
         self.chat_id = os.getenv("TELEGRAM_CHAT_ID")
         
         if not self.bot_token or not self.chat_id:
-            print("️ Credenciais do Telegram não configuradas")
+            print("⚠️ Credenciais do Telegram não configuradas")
             self.enabled = False
         else:
             self.enabled = True
@@ -24,7 +25,7 @@ class TelegramAlertBot:
         # Emoji baseado na classificação
         emojis = {
             'ERRO_TARIFA_PROVAVEL': '🚨',
-            'OFERTA_EXCELENTE': '🔥', 
+            'OFERTA_EXCELENTE': '', 
             'OFERTA_BOA': '✅',
             'OFERTA_LEVE': '👍'
         }
@@ -36,39 +37,7 @@ class TelegramAlertBot:
         message = f"""
 {emoji} *ALERTA DE PASSAGENS!* {emoji}
 
-🛫 *{route_origin} → {route_dest}*
- *Preço Atual:* R$ {current_price:,.2f}
- *Preço Médio:* R$ {avg_price:,.2f}
-🎯 *Economia:* R$ {savings:,.2f} ({discount_percent:.1f}% OFF)
-
-✈️ *Companhia:* {airline}
- *Data da Busca:* {datetime.now().strftime('%d/%m/%Y %H:%M')}
-
- *Link para Compra:*
-{google_link}
-
- *Classificação:* {classification}
-"""
-
-        try:
-            url = f"{self.base_url}/sendMessage"
-            data = {
-                "chat_id": self.chat_id,
-                "text": message,
-                "parse_mode": "Markdown"
-            }
-            
-            response = requests.post(url, json=data, timeout=10)
-            
-            if response.status_code == 200:
-                print(f"   ✅ Alerta enviado para Telegram!")
-            else:
-                print(f"   ❌ Erro ao enviar Telegram: {response.text}")
-                
-        except Exception as e:
-            print(f"   ❌ Erro de conexão com Telegram: {e}"){emoji} *ALERTA DE PASSAGENS!* {emoji}
-
-🛫 *{route_origin} → {route_dest}*
+ *{route_origin} → {route_dest}*
 💰 *Preço Atual:* R$ {current_price:,.2f}
  *Preço Médio:* R$ {avg_price:,.2f}
 🎯 *Economia:* R$ {savings:,.2f} ({discount_percent:.1f}% OFF)
@@ -76,10 +45,10 @@ class TelegramAlertBot:
 ✈️ *Companhia:* {airline}
 📅 *Data da Busca:* {datetime.now().strftime('%d/%m/%Y %H:%M')}
 
-🔗 *Link para Compra:*
+ *Link para Compra:*
 {google_link}
 
-⚡ *Classificação:* {classification}
+ *Classificação:* {classification}
 """
 
         try:
