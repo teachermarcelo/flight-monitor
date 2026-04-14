@@ -19,20 +19,17 @@ class FlightMonitor:
         self.flight_search = FlightSearch()
         self.tarif_intelligence = TarifIntelligence()
         
-        # Sensibilidade: Alerta a partir de 15% (para gerar volume)
+        # Sensibilidade: Alerta a partir de 15% de desconto
         self.min_discount_percent = 15 
 
     def get_monitored_routes(self):
-        """Retorna a lista estratégica de 5 rotas 'Campeãs' para economizar créditos"""
+        """Retorna as 3 rotas estratégicas para economizar créditos da API Free"""
         
-        # LISTA DE OURO (Alta demanda + Alta chance de erro de tarifa)
-        # Focamos nas rotas que seu público mais quer: Europa, EUA e Caribe
-       strategic_routes = [
-    {'id': 'GRU-LIS', 'origin': 'GRU', 'destination': 'LIS', 'max_price': 4500},
-    {'id': 'GRU-MIA', 'origin': 'GRU', 'destination': 'MIA', 'max_price': 3800},
-    {'id': 'GRU-CUN', 'origin': 'GRU', 'destination': 'CUN', 'max_price': 3200}
-            # Se quiser adicionar mais, cuidado com o limite de 100 buscas/mês!
-            # Cada rota extra = +120 buscas/mês (se rodar a cada 2h)
+        # TOP 3 ROTAS DE OURO (Alta demanda + Alta chance de oferta)
+        strategic_routes = [
+            {'id': 'GRU-LIS', 'origin': 'GRU', 'destination': 'LIS', 'max_price': 4500}, # Lisboa (Europa)
+            {'id': 'GRU-MIA', 'origin': 'GRU', 'destination': 'MIA', 'max_price': 3800}, # Miami (EUA)
+            {'id': 'GRU-CUN', 'origin': 'GRU', 'destination': 'CUN', 'max_price': 3200}  # Cancún (Caribe)
         ]
         
         return strategic_routes
@@ -64,20 +61,20 @@ class FlightMonitor:
             savings = analysis['average_price'] - price
             discount = analysis['discount_percent']
             
-            # SEU LINK DO GRUPO AQUI
+            # ️ COLE SEU LINK DO GRUPO AQUI
             grupo_vip_link = "https://chat.whatsapp.com/SEU_CODIGO_DO_GRUPO_AQUI" 
             
             message = (
-                f" *ALERTA VIP DETECTADO!* 🚨%0A%0A"
+                f"🚨 *ALERTA VIP DETECTADO!* 🚨%0A%0A"
                 f"✈️ *Rota:* {origin} → {destination}%0A"
                 f"💰 *Preço:* R$ {price:.2f}%0A"
-                f" *Normal:* R$ {analysis['average_price']:.2f}%0A"
+                f"📉 *Normal:* R$ {analysis['average_price']:.2f}%0A"
                 f"💸 *Economia:* R$ {savings:.2f} ({discount}% OFF)%0A"
-                f" *Cia:* {airline}%0A"
-                f"📅 *Ida/Volta:* {date_from.replace('-', '/')} a {date_to.replace('-', '/')}%0A%0A"
-                f"⚠️ *Corra!* Preço pode subir a qualquer momento.%0A"
-                f"🔗 *Link para Comprar:*%0A{google_link}%0A%0A"
-                f" *Quer receber isso todo dia?* Entre no Grupo:%0A{grupo_vip_link}%0A"
+                f"🏢 *Cia:* {airline}%0A"
+                f" *Ida/Volta:* {date_from.replace('-', '/')} a {date_to.replace('-', '/')}%0A%0A"
+                f"⚠️ *Atenção:* Preço pode subir rápido!%0A"
+                f" *Link para Comprar:*%0A{google_link}%0A%0A"
+                f"👇 *Quer receber isso todo dia?* Entre no Grupo:%0A{grupo_vip_link}%0A"
                 f"_Flight Monitor Pro_"
             )
             
@@ -90,25 +87,28 @@ class FlightMonitor:
             if resp_wpp.status_code == 200:
                 print(f"   ✅ Alerta enviado para WhatsApp!")
             else:
-                print(f"   ⚠️ Erro WhatsApp: {resp_wpp.text}")
+                print(f"   ️ Erro WhatsApp: {resp_wpp.text}")
 
             # Salva no banco
             try:
                 self.supabase.table("alerts_sent").insert({
-                    "route_id": route_id, "price": price, "discount_percent": discount,
-                    "classification": analysis['classification'], "sent_at": datetime.now().isoformat()
+                    "route_id": route_id, 
+                    "price": price, 
+                    "discount_percent": discount,
+                    "classification": analysis['classification'], 
+                    "sent_at": datetime.now().isoformat()
                 }).execute()
             except Exception:
                 pass
                 
         except Exception as e:
-            print(f"    Erro ao enviar: {e}")
+            print(f"    ❌ Erro ao enviar: {e}")
 
     def run(self):
-        print(f"🚀 Iniciando Monitoramento SNIPER (Alta Frequência) - {datetime.now()}")
+        print(f"🚀 Iniciando Monitoramento Diário (Top 3 Rotas) - {datetime.now()}")
         
         routes = self.get_monitored_routes()
-        print(f"🎯 Focando em {len(routes)} rotas estratégicas para economizar créditos...")
+        print(f" Focando em {len(routes)} rotas estratégicas...")
         
         success_count = 0
         
@@ -118,7 +118,7 @@ class FlightMonitor:
                 origin = route["origin"]
                 destination = route["destination"]
                 
-                # DATAS DINÂMICAS: Sempre daqui a 4 semanas
+                # DATAS DINÂMICAS: Sempre daqui a 4 semanas (28 dias)
                 today = datetime.now()
                 date_from = (today + timedelta(days=28)).strftime("%Y-%m-%d") 
                 date_to = (today + timedelta(days=35)).strftime("%Y-%m-%d")   
@@ -150,10 +150,10 @@ class FlightMonitor:
                         )
                         success_count += 1
                     else:
-                        print(f"   ⚖️ Preço dentro da média.")
+                        print(f"   ️ Preço dentro da média.")
                     
             except Exception as e:
-                print(f" Erro na rota {route_id}: {e}")
+                print(f"❌ Erro na rota {route_id}: {e}")
                 continue
         
         print(f"\n{'='*40}")
@@ -165,4 +165,4 @@ if __name__ == "__main__":
         monitor = FlightMonitor()
         monitor.run()
     except Exception as e:
-        print(f" Falha crítica: {e}")
+        print(f"💥 Falha crítica: {e}")
